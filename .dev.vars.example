@@ -20,3 +20,6 @@ VAULT_SITES_TOKEN=
 
 # Fotos dos serviços (Pixabay, grátis): chave em pixabay.com/api/docs. Sem ela, o app usa Wikimedia Commons (menos fotos).
 PIXABAY_API_KEY=
+
+# Clerk — autenticação SaaS. Chave publicável (começa com pk_test_ ou pk_live_). Obter em clerk.com.
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_replace-with-real-key

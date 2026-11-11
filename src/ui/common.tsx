@@ -38,7 +38,7 @@ export function Icon({ name, title }: { name: keyof typeof paths | string; title
 }
 
 // ---------- Rotas por hash ----------
-export type View = 'prospectar' | 'leads' | 'funil' | 'robo' | 'ajustes';
+export type View = 'prospectar' | 'leads' | 'funil' | 'robo' | 'ajustes' | 'dashboard' | 'admin';
 export interface Route {
   view: View;
   leadId?: string;
@@ -47,7 +47,7 @@ export interface Route {
 
 function parseHash(): Route {
   const parts = window.location.hash.replace(/^#\/?/, '').split('/');
-  const view = (['prospectar', 'leads', 'funil', 'robo', 'ajustes'].includes(parts[0]) ? parts[0] : 'prospectar') as View;
+  const view = (['prospectar', 'leads', 'funil', 'robo', 'ajustes', 'dashboard', 'admin'].includes(parts[0]) ? parts[0] : 'prospectar') as View;
   const leadId = parts[1] === 'lead' && parts[2] ? decodeURIComponent(parts[2]) : undefined;
   return { view, leadId, tab: leadId ? parts[3] : undefined };
 }

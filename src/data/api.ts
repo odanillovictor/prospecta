@@ -1,8 +1,21 @@
-// Cliente das Pages Functions. Nenhuma chave de API vive no navegador — só o token de acesso do próprio app.
+// Cliente das Pages Functions. Autenticação via Clerk JWT (Bearer token).
 import type { ImageRef, IntegrationStatus, SearchRequest, SearchResponse, SiteFacts } from '../core/types';
 import type { StockPhoto } from '../core/providers/openverse';
 import type { SiteBriefing } from '../core/briefing';
 import { store } from './store';
+
+export interface MeResponse {
+  clerkId: string;
+  email: string;
+  active: boolean;
+  usage: { searches: number; previews: number; month: string };
+  dailySearches: number;
+  remaining: { searches: number; previews: number };
+}
+
+const getToken = async (): Promise<string | null> => {
+  return (window as any).Clerk?.session?.getToken() ?? null;
+};
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -13,12 +26,12 @@ export class ApiError extends Error {
 async function call<T>(path: string, init: RequestInit = {}, timeoutMs = 60_000): Promise<{ status: number; data: T }> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
-  const token = store.getSettings().accessToken;
+  const token = await getToken();
   try {
     const res = await fetch(path, {
       ...init,
       signal: ctrl.signal,
-      headers: { 'Content-Type': 'application/json', ...(token ? { 'x-app-token': token } : {}), ...(init.headers ?? {}) },
+      headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...(init.headers ?? {}) },
     });
     const ctype = res.headers.get('content-type') ?? '';
     if (!ctype.includes('application/json')) {
@@ -103,6 +116,10 @@ export const coletorApi = {
 };
 
 export const api = {
+  /** Dados do usuário logado: cota, uso e status de ativação. */
+  async me(): Promise<MeResponse> {
+    return (await call<MeResponse>('/api/me', { method: 'GET' }, 10_000)).data;
+  },
   /** Despublica a prévia online (o link para de funcionar). */
   async unpublishPreview(id: string): Promise<void> {
     await call<{ ok: boolean }>(`/api/preview?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, 30_000);
@@ -135,9 +152,9 @@ export const api = {
     const hit = imageCache.get(key);
     if (hit) return hit;
     const p = (async () => {
-      const token = store.getSettings().accessToken;
+      const token = await getToken();
       const qs = ref.kind === 'place' ? `place=${encodeURIComponent(ref.value)}` : `url=${encodeURIComponent(ref.value)}`;
-      const res = await fetch(`/api/image?${qs}`, { headers: token ? { 'x-app-token': token } : {} });
+      const res = await fetch(`/api/image?${qs}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new ApiError(res.status, (data as { error?: string }).error ?? `HTTP ${res.status}`);
