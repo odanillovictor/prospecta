@@ -8,6 +8,7 @@ import { scoreLead } from '../core/scoring';
 import { domainOf, formatPhone, isNonOwnSite, normalizeBrPhone } from '../core/normalize';
 import { validateSearch } from '../core/validation';
 import { api, ApiError, coletorApi } from '../data/api';
+import type { MeResponse } from '../data/api';
 import { store, useLeads, useSettings } from '../data/store';
 import { GOOGLE_MONTHLY_LIMIT, GOOGLE_WARN_AT, addGoogleUsage, googleUsed } from '../data/quota';
 import { Icon, Notice, ScoreBadge, useStoredState, useToast } from './common';
@@ -33,7 +34,7 @@ function coverOf(b: RawBusiness): string | undefined {
   return u ? u.replace(/=w\d+-h\d+[\w-]*$/, '=w640-h320-c') : undefined;
 }
 
-export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void }) {
+export function SearchView({ onOpenLead, meData }: { onOpenLead: (id: string) => void; meData?: MeResponse | null }) {
   const leads = useLeads();
   const toast = useToast();
   const { scoring } = useSettings();
@@ -46,9 +47,9 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
   const [onlyWithSite, setOnlyWithSite] = useStoredState('search.onlyWithSite', false);
   const [needPhone, setNeedPhone] = useStoredState('search.needPhone', false);
   // Quantidade de resultados desejada: menos = busca mais rápida.
-  // Campo livre (digita o número que quiser, sem setas): vale exatamente o que foi digitado, de 1 a 120.
-  const [limitText, setLimitText] = useStoredState('search.limitText', '20');
-  const safeLimit = Math.max(1, Math.min(120, Math.round(Number(limitText) || 20)));
+  // Campo livre (digita o número que quiser, sem setas): vale exatamente o que foi digitado, de 1 a 50.
+  const [limitText, setLimitText] = useStoredState('search.limitText', '50');
+  const safeLimit = Math.max(1, Math.min(50, Math.round(Number(limitText) || 50)));
   // Com filtros, busca mais empresas para sobrar a quantidade pedida depois de filtrar.
   // Sem filtros pede um pouco a mais: duplicatas entre fontes são unidas e a lista final fica com a quantidade exata pedida.
   const fetchLimit = onlyNoSite || onlyWithSite || needPhone ? Math.min(120, Math.max(safeLimit * 3, 20)) : Math.min(120, Math.ceil(safeLimit * 1.25) + 2);
@@ -60,6 +61,8 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
   const [googleUsedNow, setGoogleUsedNow] = useState(() => googleUsed());
   const [phase, setPhase] = useState<Phase>(batch ? 'done' : 'idle');
   const [error, setError] = useState<string | null>(null);
+  const [cachedAt, setCachedAt] = useState<number | null>(null);
+  const [searchWarning, setSearchWarning] = useState<string | null>(null);
 
   const realLeads = useMemo(() => leads.filter((l) => !l.isDemo), [leads]);
 
@@ -93,6 +96,8 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
     setSelected(new Set());
     setError(null);
     setPhase('idle');
+    setCachedAt(null);
+    setSearchWarning(null);
   }
 
   // Coletor local do Google Maps: verifica se está rodando neste computador.
@@ -139,8 +144,7 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
     }
   }
 
-  async function runSearch(e: React.FormEvent, override?: ProviderId[]) {
-    e.preventDefault();
+  async function doSearch(override?: ProviderId[]) {
     const active = override ?? providers;
     const useGmaps = active.includes('gmaps') && !!coletorUp;
     const serverProviders = active.filter((p) => p !== 'gmaps');
@@ -164,6 +168,8 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
     setPhase('loading');
     setError(null);
     setProgress('');
+    setCachedAt(null);
+    setSearchWarning(null);
     try {
       // OpenStreetMap é consultado direto do aparelho: os servidores Overpass recusam pedidos vindos do Cloudflare.
       const wantOsm = serverProviders.includes('osm');
@@ -178,11 +184,18 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
       if (gp && gp.status !== 'nao_configurado' && gp.status !== 'erro' && !gp.cached) setGoogleUsedNow(addGoogleUsage(Math.min(3, Math.max(1, Math.ceil(fetchLimit / 20)))));
       const items = mergeRawList([...(g?.items ?? []), ...(srv?.results ?? []), ...(osm?.results ?? [])]);
       const outcomes = [...(g ? [g.outcome] : []), ...(srv?.providers ?? []), ...(osm ? [osm.outcome] : [])];
+      if (srv?.cachedAt) setCachedAt(srv.cachedAt);
+      if (srv?.warning) setSearchWarning(srv.warning);
       loadBatch({ niche: v.value.niche, label: `${v.value.niche} · ${v.value.location}`, items, providers: outcomes });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Falha inesperada na busca.');
       setPhase('error');
     }
+  }
+
+  async function runSearch(e: React.FormEvent, override?: ProviderId[]) {
+    e.preventDefault();
+    doSearch(override);
   }
 
   function save(toFunnel = false) {
@@ -243,12 +256,15 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
         <div className="kicker" style={{ color: '#a9a59c' }}>Prospecção</div>
         <h1>Quem precisa de um site hoje?</h1>
         <p className="muted" style={{ margin: '6px 0 0' }}>Busque por nicho e local. Você revisa os resultados antes de salvar.</p>
+        {meData && (
+          <p className="small muted" style={{ margin: '4px 0 0' }}>{meData.remaining.searches} buscas restantes este mês</p>
+        )}
         <form onSubmit={runSearch}>
           <div className="search-grid">
             <label className="field"><span>O quê? (qualquer nicho)</span>
               <input className="input input-lg" value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="dentista, pet shop, corretor…" maxLength={80} autoComplete="off" />
             </label>
-            <label className="field qty"><span>Quantos?</span>
+            <label className="field qty"><span>Quantos? <span className="tiny muted">1 busca = 1 crédito, independente da quantidade. Busque sempre o máximo.</span></span>
               <input className="input input-lg" type="text" inputMode="numeric" pattern="[0-9]*" maxLength={3} value={limitText} onChange={(e) => setLimitText(e.target.value.replace(/\D/g, '').slice(0, 3))} onBlur={() => setLimitText(String(safeLimit))} aria-label="Quantidade de resultados" />
             </label>
             <label className="field"><span>Onde? (cidade, região ou bairro)</span>
@@ -329,6 +345,20 @@ export function SearchView({ onOpenLead }: { onOpenLead: (id: string) => void })
               <button className="btn btn-primary" onClick={() => save()} disabled={!visibleSelected}>Salvar {visibleSelected} lead{visibleSelected === 1 ? '' : 's'}</button>
             </div>
           </div>
+          {cachedAt != null && (
+            <div style={{ marginBottom: 10 }}>
+              <Notice kind="info">
+                Resultados salvos há {Math.floor((Date.now() - cachedAt) / 86_400_000)} dias.{' '}
+                <button className="btn btn-sm" onClick={() => { clearResults(); doSearch(); }}>Atualizar</button>{' '}
+                (gasta 1 busca)
+              </Notice>
+            </div>
+          )}
+          {searchWarning && (
+            <div style={{ marginBottom: 10 }}>
+              <Notice kind="warn">{searchWarning}</Notice>
+            </div>
+          )}
           <div className="provider-line">
             {batch.providers.map((p) => (
               <span key={p.provider} className={`chip ${p.status === 'ok' ? 'chip-ok' : p.status === 'erro' ? 'chip-bad' : p.status === 'nao_configurado' ? 'chip-cold' : 'chip-attn'}`} title={p.message}>

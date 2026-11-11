@@ -133,7 +133,7 @@ export function App() {
         <main className="main">
           {storeError && <div style={{ marginBottom: 14 }}><Notice kind="error">{storeError}</Notice></div>}
           {route.view === 'dashboard' && <DashboardView meData={meData} />}
-          {route.view === 'prospectar' && <SearchView onOpenLead={(id) => go({ view: 'leads', leadId: id })} />}
+          {route.view === 'prospectar' && <SearchView onOpenLead={(id) => go({ view: 'leads', leadId: id })} meData={meData} />}
           {route.view === 'leads' && <LeadsView scored={scored} onOpen={(id) => go({ view: 'leads', leadId: id })} goSearch={() => go({ view: 'prospectar' })} />}
           {route.view === 'funil' && <FunnelView scored={scored} onOpen={(id) => go({ view: 'funil', leadId: id })} />}
           {route.view === 'robo' && <RobotView />}

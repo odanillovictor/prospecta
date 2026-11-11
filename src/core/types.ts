@@ -392,6 +392,8 @@ export interface SearchResponse {
   results: RawBusiness[];
   providers: ProviderOutcome[];
   query: { niche: string; location: string };
+  cachedAt?: number;
+  warning?: string;
 }
 
 export interface IntegrationStatus {
