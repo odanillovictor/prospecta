@@ -5,6 +5,7 @@ import { validatePublicUrl } from '../../src/core/validation';
 import { extractHtmlFacts } from '../../src/core/htmlFacts';
 import { extractBrandAssets } from '../../src/core/brandAssets';
 import { type Env, errorJson, fetchWithTimeout, json, logError, readJson, redact } from '../../server/http';
+import { ensureUser } from '../../server/quota';
 
 const MAX_BYTES = 2_000_000;
 const MAX_REDIRECTS = 5;
@@ -66,6 +67,11 @@ async function pagespeed(url: string, key: string): Promise<SiteFacts['pagespeed
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+  const clerkId = request.headers.get('x-clerk-id');
+  if (!clerkId) return errorJson(401, 'Autenticação necessária.', 'unauthorized');
+  const { active } = await ensureUser(env.DB!, clerkId, '');
+  if (!active) return errorJson(403, 'Conta ainda não ativada.', 'inactive');
+
   const body = (await readJson(request)) as { url?: unknown };
   const v = validatePublicUrl(body?.url);
   if (!v.ok) return errorJson(400, v.error);

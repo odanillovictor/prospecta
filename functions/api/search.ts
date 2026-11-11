@@ -12,7 +12,7 @@ const TTL = 60 * 60 * 24 * 7; // 7 dias
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const clerkId = request.headers.get('x-clerk-id');
   if (!clerkId) return errorJson(401, 'Autenticação necessária.', 'unauthorized');
-  const { active } = await ensureUser(env.DB!, clerkId, '');
+  const { active } = await ensureUser(env.DB!, clerkId, request.headers.get('x-clerk-email') ?? '');
   if (!active) return errorJson(403, 'Conta ainda não ativada.', 'inactive');
   const quota = await checkQuota(env.DB!, clerkId, 'search');
   if (!quota.allowed) return errorJson(429, `Você atingiu o limite de ${MONTHLY_SEARCHES} buscas este mês.`, 'quota_exceeded');

@@ -4,6 +4,7 @@
 import { validatePublicUrl } from '../../src/core/validation';
 import { PHOTO_NAME } from '../../src/core/providers/googlePlaces';
 import { type Env, errorJson, fetchWithTimeout, logError } from '../../server/http';
+import { ensureUser } from '../../server/quota';
 
 const MAX_BYTES = 5_000_000;
 const ALLOWED = /^image\/(png|jpeg|jpg|webp|gif)\b/i;
@@ -35,6 +36,11 @@ async function capped(res: Response): Promise<Uint8Array | null> {
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+  const clerkId = request.headers.get('x-clerk-id');
+  if (!clerkId) return errorJson(401, 'Autenticação necessária.', 'unauthorized');
+  const { active } = await ensureUser(env.DB!, clerkId, '');
+  if (!active) return errorJson(403, 'Conta ainda não ativada.', 'inactive');
+
   const params = new URL(request.url).searchParams;
   const place = params.get('place');
   const raw = params.get('url');

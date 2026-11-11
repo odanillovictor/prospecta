@@ -10,7 +10,9 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
   if (user === null) return errorJson(401, 'Autenticação necessária.', 'unauthorized');
 
   const modifiedHeaders = new Headers(request.headers);
+  modifiedHeaders.delete('x-clerk-admin'); // prevent header spoofing
   modifiedHeaders.set('x-clerk-id', user.clerkId);
+  modifiedHeaders.set('x-clerk-email', user.email);
   if (user.isAdmin) modifiedHeaders.set('x-clerk-admin', '1');
   const modifiedRequest = new Request(request, { headers: modifiedHeaders });
 

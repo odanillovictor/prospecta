@@ -8,7 +8,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (!clerkId) return errorJson(401, 'Não autenticado.');
 
   const db = env.DB!;
-  const { active } = await ensureUser(db, clerkId, '');
+  const { active } = await ensureUser(db, clerkId, request.headers.get('x-clerk-email') ?? '');
 
   const month = new Date().toISOString().slice(0, 7);
   const today = new Date().toISOString().slice(0, 10);

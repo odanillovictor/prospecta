@@ -10,7 +10,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const clerkId = request.headers.get('x-clerk-id');
   if (!clerkId) return errorJson(401, 'Autenticação necessária.', 'unauthorized');
-  const { active } = await ensureUser(env.DB!, clerkId, '');
+  const { active } = await ensureUser(env.DB!, clerkId, request.headers.get('x-clerk-email') ?? '');
   if (!active) return errorJson(403, 'Conta ainda não ativada.', 'inactive');
   const quota = await checkQuota(env.DB!, clerkId, 'preview');
   if (!quota.allowed) return errorJson(429, quota.reason ?? 'Limite de prévias atingido.', 'quota_exceeded');
