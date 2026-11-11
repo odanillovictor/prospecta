@@ -12,6 +12,7 @@ import { SettingsView } from './SettingsView';
 import { LeadDetail } from './LeadDetail';
 import { RobotView } from './RobotUI';
 import { robotAttention, robotTick } from '../data/robot';
+import DashboardView from './DashboardView';
 
 export interface IntegrationsState {
   status: IntegrationStatus | null;
@@ -130,7 +131,7 @@ export function App() {
 
         <main className="main">
           {storeError && <div style={{ marginBottom: 14 }}><Notice kind="error">{storeError}</Notice></div>}
-          {route.view === 'dashboard' && <div>Dashboard (em breve)</div>}
+          {route.view === 'dashboard' && <DashboardView meData={meData} />}
           {route.view === 'prospectar' && <SearchView onOpenLead={(id) => go({ view: 'leads', leadId: id })} />}
           {route.view === 'leads' && <LeadsView scored={scored} onOpen={(id) => go({ view: 'leads', leadId: id })} goSearch={() => go({ view: 'prospectar' })} />}
           {route.view === 'funil' && <FunnelView scored={scored} onOpen={(id) => go({ view: 'funil', leadId: id })} />}
