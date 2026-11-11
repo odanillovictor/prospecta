@@ -6,7 +6,7 @@
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-jDnIOdUvK2UMEGT3XFckZTxjMGCJd+NEQQC08ohIHW8='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com; frame-src 'self' blob: https://www.google.com; connect-src 'self' http://127.0.0.1:8790 http://localhost:8790 http://127.0.0.1:8791 http://localhost:8791 https://nominatim.openstreetmap.org https://overpass-api.de https://maps.mail.ru https://overpass.private.coffee; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-jDnIOdUvK2UMEGT3XFckZTxjMGCJd+NEQQC08ohIHW8=' https://*.clerk.accounts.dev https://*.clerk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.clerk.com; frame-src 'self' blob: https://www.google.com https://*.clerk.accounts.dev https://*.clerk.com; connect-src 'self' http://127.0.0.1:8790 http://localhost:8790 http://127.0.0.1:8791 http://localhost:8791 https://nominatim.openstreetmap.org https://overpass-api.de https://maps.mail.ru https://overpass.private.coffee https://*.clerk.accounts.dev https://*.clerk.com https://clerk.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
 
 /sw.js
   Cache-Control: no-cache

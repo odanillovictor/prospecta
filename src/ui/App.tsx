@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useUser, RedirectToSignIn } from '@clerk/clerk-react';
 import { isClosed, type IntegrationStatus } from '../core/types';
 import { api, ApiError, type MeResponse } from '../data/api';
-import { store, useStoreError } from '../data/store';
+import { useStoreError } from '../data/store';
 import { Icon, Notice, useRoute, useScoredLeads, type View } from './common';
 import { SearchView } from './SearchView';
 import { LeadsView } from './LeadsView';
@@ -42,7 +42,6 @@ export function App() {
   const storeError = useStoreError();
   const [integrations, setIntegrations] = useState<IntegrationStatus | null>(null);
   const [intError, setIntError] = useState<string | null>(null);
-  const [needsToken, setNeedsToken] = useState(false);
   const [tick, setTick] = useState(0);
   const [meData, setMeData] = useState<MeResponse | null>(null);
   const [meLoaded, setMeLoaded] = useState(false);
@@ -58,15 +57,16 @@ export function App() {
   }, [isSignedIn]);
 
   useEffect(() => {
+    if (!isSignedIn) return;
     let alive = true;
     api
       .integrations()
       .then((s) => alive && (setIntegrations(s), setIntError(null)))
-      .catch((e: ApiError) => { if (!alive) return; setIntError(e.message); setNeedsToken(e.status === 401); });
+      .catch((e: ApiError) => { if (!alive) return; setIntError(e.message); });
     return () => {
       alive = false;
     };
-  }, [tick]);
+  }, [tick, isSignedIn]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -82,9 +82,9 @@ export function App() {
     };
   }, []);
 
-  if (!isLoaded) return <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}><span className="spinner" /></div>;
+  if (!isLoaded || (isSignedIn && !meLoaded)) return <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}><span className="spinner" /></div>;
   if (!isSignedIn) return <RedirectToSignIn />;
-  if (meLoaded && meData?.active === false) return (
+  if (meData !== null && !meData.active) return (
     <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <div className="modal" style={{ width: 'min(420px, 100%)', textAlign: 'center' }}>
         <div className="modal-head"><h2>Aguardando ativação</h2></div>
@@ -150,42 +150,8 @@ export function App() {
           ))}
         </nav>
       </div>
-      {needsToken && <AccessGate onDone={() => { setNeedsToken(false); setTick((t) => t + 1); }} />}
       {route.leadId && <LeadDetail key={route.leadId} leadId={route.leadId} initialTab={route.tab} onClose={() => go({ view: route.view })} />}
     </IntegrationsCtx.Provider>
   );
 }
 
-/** Tela de acesso: aparece quando o site publicado exige o código (APP_ACCESS_TOKEN) e ele ainda não foi informado. */
-function AccessGate({ onDone }: { onDone: () => void }) {
-  const [code, setCode] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    store.setSettings({ accessToken: code.trim() });
-    try {
-      await api.integrations();
-      onDone();
-    } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? 'Código incorreto. Confira e tente de novo.' : 'Não foi possível validar agora. Tente novamente.');
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <div className="modal-backdrop" style={{ zIndex: 90 }}>
-      <form className="modal" onSubmit={submit} style={{ width: 'min(420px, 100%)' }}>
-        <div className="modal-head"><h2>Acesso ao Prospecta</h2></div>
-        <div className="modal-body">
-          <p className="small muted" style={{ margin: 0 }}>Digite o código de acesso desta instalação. Ele fica salvo neste navegador e só é pedido uma vez.</p>
-          {error && <Notice kind="error">{error}</Notice>}
-          <input className="input input-lg" type="password" autoFocus autoComplete="current-password" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Código de acesso" aria-label="Código de acesso" />
-        </div>
-        <div className="modal-foot"><button className="btn btn-primary" disabled={!code.trim() || busy}>{busy ? <span className="spinner" /> : null} Entrar</button></div>
-      </form>
-    </div>
-  );
-}
