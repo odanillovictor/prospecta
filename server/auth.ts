@@ -25,7 +25,14 @@ export async function verifyClerkToken(request: Request, env: Env): Promise<Cler
   const token = authHeader.slice(7);
 
   try {
-    const payload = await verifyToken(token, { secretKey: env.CLERK_SECRET_KEY });
+    // @clerk/backend v3 may return { data, errors } instead of throwing on failure.
+    const rawResult = await verifyToken(token, { secretKey: env.CLERK_SECRET_KEY });
+    const { data: wrappedPayload, errors } = rawResult as unknown as {
+      data?: typeof rawResult;
+      errors?: unknown[];
+    };
+    const payload = wrappedPayload ?? rawResult;
+    if (errors || !payload) return null;
 
     // Email: use claim from token if present, else fetch from Clerk API.
     let email: string;
