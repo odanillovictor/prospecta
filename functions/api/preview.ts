@@ -3,9 +3,18 @@
 import { PREVIEW_ID, PREVIEW_MAX_OG, PREVIEW_TTL_SECONDS, validPreviewHtml } from '../../src/core/preview';
 import { dataUrlToBytes } from '../../src/core/zip';
 import { type Env, errorJson, json, readJson } from '../../server/http';
+import { checkQuota, ensureUser, incrementQuota } from '../../server/quota';
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (!env.PREVIEWS) return errorJson(501, 'Armazenamento de prévias (KV PREVIEWS) não configurado.');
+
+  const clerkId = request.headers.get('x-clerk-id');
+  if (!clerkId) return errorJson(401, 'Autenticação necessária.', 'unauthorized');
+  const { active } = await ensureUser(env.DB!, clerkId, '');
+  if (!active) return errorJson(403, 'Conta ainda não ativada.', 'inactive');
+  const quota = await checkQuota(env.DB!, clerkId, 'preview');
+  if (!quota.allowed) return errorJson(429, quota.reason ?? 'Limite de prévias atingido.', 'quota_exceeded');
+
   const body = (await readJson(request, 24_000_000)) as { id?: unknown; html?: unknown; og?: unknown };
   const id = String(body?.id ?? '');
   if (!PREVIEW_ID.test(id)) return errorJson(400, 'Id de prévia inválido.');
@@ -18,6 +27,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       await env.PREVIEWS.put(`og:${id}`, og.bytes, { expirationTtl: PREVIEW_TTL_SECONDS, metadata: { type: og.ext === 'png' ? 'image/png' : 'image/jpeg' } });
     }
   }
+
+  await incrementQuota(env.DB!, clerkId, 'preview');
   const url = `${new URL(request.url).origin}/p/${id}`;
   return json({ ok: true, id, url, expiresInDays: PREVIEW_TTL_SECONDS / 86400 });
 };

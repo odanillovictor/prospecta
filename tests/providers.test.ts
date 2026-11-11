@@ -126,7 +126,7 @@ describe('validação', () => {
   it('busca', () => {
     expect(validateSearch({ niche: 'd', location: 'Curitiba' }).ok).toBe(false);
     const v = validateSearch({ niche: ' <dentista> ', location: 'Curitiba', providers: ['osm', 'hack'], limit: 9999 });
-    expect(v.ok && v.value).toMatchObject({ niche: 'dentista', providers: ['osm'], limit: 200 });
+    expect(v.ok && v.value).toMatchObject({ niche: 'dentista', providers: ['osm'], limit: 50 });
   });
   it.each(['http://localhost', 'http://127.0.0.1', 'http://10.0.0.1', 'http://192.168.0.10', 'http://169.254.169.254', 'ftp://x.com', 'http://x.com:8080', 'http://user:pw@x.com', 'http://[::1]', 'http://intranet'])('bloqueia %s', (u) => {
     expect(validatePublicUrl(u).ok).toBe(false);

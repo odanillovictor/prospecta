@@ -23,8 +23,8 @@ export function validateSearch(input: unknown): Validated<Required<SearchRequest
     ? (o.providers.filter((p) => SEARCH_PROVIDERS.includes(p as ProviderId)) as ProviderId[])
     : ['osm' as ProviderId];
   if (!providers.length) return { ok: false, error: 'Selecione ao menos uma fonte de dados.' };
-  const limitNum = Number(o.limit ?? 60);
-  const limit = Number.isFinite(limitNum) ? Math.max(1, Math.min(200, Math.round(limitNum))) : 60;
+  const limitNum = Number(o.limit ?? 50);
+  const limit = Number.isFinite(limitNum) ? Math.max(1, Math.min(50, Math.round(limitNum))) : 50;
   return { ok: true, value: { niche, location, providers: [...new Set(providers)], limit } };
 }
 
