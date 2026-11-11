@@ -13,6 +13,7 @@ import { LeadDetail } from './LeadDetail';
 import { RobotView } from './RobotUI';
 import { robotAttention, robotTick } from '../data/robot';
 import DashboardView from './DashboardView';
+import AdminView from './AdminView';
 
 export interface IntegrationsState {
   status: IntegrationStatus | null;
@@ -137,7 +138,7 @@ export function App() {
           {route.view === 'funil' && <FunnelView scored={scored} onOpen={(id) => go({ view: 'funil', leadId: id })} />}
           {route.view === 'robo' && <RobotView />}
           {route.view === 'ajustes' && <SettingsView />}
-          {route.view === 'admin' && <div>Admin (em breve)</div>}
+          {route.view === 'admin' && <AdminView />}
         </main>
 
         <nav className="tabbar" aria-label="Principal">
