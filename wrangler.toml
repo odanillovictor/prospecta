@@ -9,7 +9,7 @@ compatibility_date = "2024-09-23"
 # Identificação enviada ao Nominatim/Overpass (exigida pela política de uso do OSM).
 OSM_CONTACT = "prospecta (configure um e-mail de contato)"
 # Chave pública do Clerk (segura para expor). A secreta vai como segredo: npx wrangler pages secret put CLERK_SECRET_KEY
-CLERK_PUBLISHABLE_KEY = ""
+CLERK_PUBLISHABLE_KEY = "pk_test_d29uZHJvdXMtdG91Y2FuLTEwOTUuY2xlcmsuYWNjb3VudHMuZGV2JA"
 
 # Prévias online dos sites gerados (link para mostrar ao cliente). Expiram em 90 dias.
 [[kv_namespaces]]
