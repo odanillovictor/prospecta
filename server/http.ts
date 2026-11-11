@@ -15,6 +15,12 @@ export interface Env {
   PEXELS_API_KEY?: string;
   /** Chave gratuita do Pixabay (fotos dos serviços). Tem prioridade sobre o Pexels. */
   PIXABAY_API_KEY?: string;
+  /** Banco D1 para autenticação SaaS (usuários, cotas de uso). */
+  DB?: D1Database;
+  /** Chave secreta do Clerk (nunca em vars; vai como segredo no Cloudflare). */
+  CLERK_SECRET_KEY?: string;
+  /** Chave pública do Clerk (pode ficar em vars). */
+  CLERK_PUBLISHABLE_KEY?: string;
 }
 
 export function json(data: unknown, status = 200, extra: Record<string, string> = {}): Response {
