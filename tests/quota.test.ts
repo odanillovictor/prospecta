@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { addGoogleUsage, googleUsed } from '../src/data/quota';
+import { MONTHLY_SEARCHES, MONTHLY_PREVIEWS, DAILY_SEARCH_WARN } from '../server/quota';
 
 describe('contador mensal do Google', () => {
   beforeEach(() => {
@@ -23,4 +24,10 @@ describe('contador mensal do Google', () => {
     const d = new Date(2026, 5, 1);
     expect(addGoogleUsage(-5, d)).toBe(0);
   });
+});
+
+describe('quota constants', () => {
+  it('monthly searches limit is 200', () => expect(MONTHLY_SEARCHES).toBe(200));
+  it('monthly previews limit is 50', () => expect(MONTHLY_PREVIEWS).toBe(50));
+  it('daily warn threshold is 20', () => expect(DAILY_SEARCH_WARN).toBe(20));
 });
