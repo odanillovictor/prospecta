@@ -22,4 +22,4 @@ id = "3adc7e81aa2b4f749f1064b97c4a742f"
 [[d1_databases]]
 binding = "DB"
 database_name = "prospecta-db"
-database_id = "placeholder-replace-before-deploy"
+database_id = "5b6a4250-ad8b-4615-ad25-0a89a9fa4592"
