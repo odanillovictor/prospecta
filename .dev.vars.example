@@ -1,0 +1,22 @@
+# Copie para .dev.vars (não versionado) e preencha somente o que você tiver.
+# Em produção, cadastre como "secrets" no Cloudflare Pages. Nunca use prefixo VITE_ para segredos.
+
+# Protege /api/* com um token simples enviado pelo app (header x-app-token).
+# Recomendado em produção: Cloudflare Access na frente do projeto inteiro.
+APP_ACCESS_TOKEN=
+
+# Google Places API (New) — Text Search. Opcional e pago por consulta (há cota gratuita mensal).
+GOOGLE_PLACES_API_KEY=
+
+# Google PageSpeed Insights API — opcional, gratuita com chave. Habilita métricas reais de velocidade.
+PAGESPEED_API_KEY=
+
+# Contato para a política de uso do Nominatim/Overpass (OpenStreetMap).
+OSM_CONTACT=prospecta (seu-email@exemplo.com)
+
+# vault-sites — somente quando existir um endpoint real e documentado.
+VAULT_SITES_ENDPOINT=
+VAULT_SITES_TOKEN=
+
+# Fotos dos serviços (Pixabay, grátis): chave em pixabay.com/api/docs. Sem ela, o app usa Wikimedia Commons (menos fotos).
+PIXABAY_API_KEY=

@@ -1,0 +1,39 @@
+{
+  "name": "prospecta",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Plataforma de prospecção, diagnóstico e funil comercial para venda de sites (Cloudflare Pages + PWA).",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "wrangler pages dev dist --port 8788 --compatibility-date=2024-09-23",
+    "build": "vite build",
+    "preview": "npm run build && wrangler pages dev dist --port 8788 --compatibility-date=2024-09-23",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p functions/tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "icons": "node scripts/gen-icons.mjs",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "coletor": "node coletor/server.mjs",
+    "celular": "node scripts/celular.mjs",
+    "coletor:testar": "node coletor/testar.mjs",
+    "robo": "node --env-file-if-exists=.robo.env robo/server.mjs",
+    "robo:real": "node --env-file-if-exists=.robo.env robo/real.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241112.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8",
+    "wrangler": "^3.91.0"
+  }
+}

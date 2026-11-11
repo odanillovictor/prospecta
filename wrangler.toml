@@ -1,0 +1,15 @@
+# Configuração do Cloudflare Pages (projeto + Functions).
+# Segredos NÃO entram aqui: use `wrangler pages secret put NOME` ou o painel do Cloudflare.
+# Localmente, copie .dev.vars.example para .dev.vars (arquivo ignorado pelo git).
+name = "prospecta"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-09-23"
+
+[vars]
+# Identificação enviada ao Nominatim/Overpass (exigida pela política de uso do OSM).
+OSM_CONTACT = "prospecta (configure um e-mail de contato)"
+
+# Prévias online dos sites gerados (link para mostrar ao cliente). Expiram em 90 dias.
+[[kv_namespaces]]
+binding = "PREVIEWS"
+id = "3adc7e81aa2b4f749f1064b97c4a742f"

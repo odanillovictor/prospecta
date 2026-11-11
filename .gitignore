@@ -1,0 +1,23 @@
+node_modules
+dist
+.wrangler
+.dev.vars
+.env
+.env.*
+!.env.example
+*.log
+coverage
+.tmp
+coletor/bin/
+coletor/saida/
+.acesso-producao.txt
+.coletor-nuvem.txt
+
+robo/estado.json
+.robo.env
+.celular/
+.celular-token
+.celular-qr.html
+
+# SDD workspaces
+.superpowers/
