@@ -2,7 +2,8 @@
 // com token. No celular, abra o endereço que aparecer aqui. Só funciona com o PC ligado e na mesma rede.
 import { execSync, spawn } from 'node:child_process';
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { networkInterfaces } from 'node:os';
+import { networkInterfaces, tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import qrcode from 'qrcode-terminal';
 import QR from 'qrcode';
@@ -10,6 +11,8 @@ import QR from 'qrcode';
 // ABRIR_PC=1 (usado por "Abrir Prospecta (PC).bat"): abre o app no Chrome do PC quando estiver pronto, sem a página do QR.
 const PC = process.env.ABRIR_PC === '1';
 const APP_PORT = 8788;
+// Saída da compilação fora do Google Drive (o Drive trava a exclusão de pastas: EPERM/ENOTEMPTY).
+const OUT = join(tmpdir(), 'prospecta-celular');
 const COLETOR_PORT = 8790;
 
 const privateIp = (ip) => /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
@@ -30,12 +33,13 @@ const TOKEN = readFileSync(TOKEN_FILE, 'utf8').trim();
 const patchHeaders = () => {
   try {
     const h = readFileSync('public/_headers', 'utf8').replace(/connect-src 'self'/, `connect-src 'self' http://${IP}:${COLETOR_PORT}`);
-    if (!existsSync('.celular/_headers') || readFileSync('.celular/_headers', 'utf8') !== h) writeFileSync('.celular/_headers', h);
+    const hf = join(OUT, '_headers');
+    if (!existsSync(hf) || readFileSync(hf, 'utf8') !== h) writeFileSync(hf, h);
   } catch { /* compilando */ }
 };
-rmSync('.celular', { recursive: true, force: true });
+try { rmSync(OUT, { recursive: true, force: true }); } catch { /* o vite esvazia a pasta ao compilar */ }
 console.log('Compilando o app (primeira vez, leva alguns segundos)...');
-execSync('npx vite build --outDir .celular --emptyOutDir', { stdio: PC ? 'ignore' : 'inherit' });
+execSync(`npx vite build --outDir "${OUT}" --emptyOutDir`, { stdio: PC ? 'ignore' : 'inherit' });
 patchHeaders();
 setInterval(patchHeaders, 1500);
 
@@ -51,8 +55,8 @@ const coletor = run('node', ['coletor/server.mjs'], {
   COLETOR_PUBLIC_HOST: `${IP}:${COLETOR_PORT}`,
   COLETOR_ORIGINS: `http://${IP}:${APP_PORT},http://localhost:${APP_PORT},http://127.0.0.1:${APP_PORT}`,
 });
-const watcher = run('npx', ['vite', 'build', '--watch', '--outDir', '.celular', '--emptyOutDir=false'], {}, true);
-const app = run('npx', ['wrangler', 'pages', 'dev', '.celular', '--ip', '0.0.0.0', '--port', String(APP_PORT), '--compatibility-date=2024-09-23'], {}, true);
+const watcher = run('npx', ['vite', 'build', '--watch', '--outDir', `"${OUT}"`, '--emptyOutDir=false'], {}, true);
+const app = run('npx', ['wrangler', 'pages', 'dev', `"${OUT}"`, '--ip', '0.0.0.0', '--port', String(APP_PORT), '--compatibility-date=2024-09-23'], {}, true);
 
 setTimeout(() => {
   if (PC) return; // no PC não precisa de QR nem de link: o app abre sozinho no Chrome

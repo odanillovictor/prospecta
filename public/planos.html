@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Plano — SiteSales</title>
+<meta name="robots" content="noindex"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#09090f;--s1:#111118;--s2:#17171f;
+  --ink:#f0f0f5;--muted:#9898b0;
+  --accent:#e05c2b;--border:#22222e;--radius:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-height:100%}
+body{min-height:100vh;position:relative;overflow-x:hidden}
+
+/* ---- Fundo simulado do app (blur) ---- */
+.app-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.app-bg-sidebar{position:absolute;left:0;top:0;bottom:0;width:210px;background:#111118;border-right:1px solid #22222e;filter:blur(2px)}
+.app-bg-sidebar-logo{margin:20px 16px 28px;height:28px;background:#e05c2b;border-radius:6px;opacity:.5;width:120px}
+.app-bg-sidebar-nav{display:flex;flex-direction:column;gap:6px;padding:0 12px}
+.app-bg-sidebar-item{height:36px;background:#17171f;border-radius:8px}
+.app-bg-sidebar-item:nth-child(2){background:rgba(224,92,43,.15)}
+.app-bg-topbar{position:absolute;left:210px;top:0;right:0;height:52px;background:#111118;border-bottom:1px solid #22222e;filter:blur(1px)}
+.app-bg-cards{position:absolute;left:230px;top:72px;right:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.app-bg-card{height:88px;background:#111118;border-radius:10px;border:1px solid #22222e;filter:blur(2px)}
+.app-bg-rows{position:absolute;left:230px;top:300px;right:20px;display:flex;flex-direction:column;gap:8px}
+.app-bg-row{height:46px;background:#111118;border-radius:8px;border:1px solid #22222e;filter:blur(2px)}
+.app-bg-scrim{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(9,9,15,.55),rgba(9,9,15,.97))}
+
+/* ---- Main overlay ---- */
+.page{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:24px 16px 40px}
+
+/* ---- Back link ---- */
+.back-link{position:fixed;top:16px;right:16px;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;transition:border-color .15s;z-index:10}
+.back-link:hover{border-color:var(--accent);color:var(--ink)}
+
+/* ---- Two-column layout ---- */
+.wrap{width:100%;max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+@media(max-width:680px){.wrap{grid-template-columns:1fr;gap:28px}}
+
+/* ---- Left column ---- */
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:36px}
+.logo svg{width:28px;height:28px}
+.logo span{font-size:1.1rem;font-weight:800;letter-spacing:-.03em}
+
+/* Black Friday banner */
+.bf-banner{background:rgba(224,92,43,.08);border:1px solid rgba(224,92,43,.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bf-left{display:flex;flex-direction:column}
+.bf-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.bf-note{font-size:.68rem;color:var(--muted);margin-top:2px}
+.bf-timer{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;letter-spacing:.04em;color:var(--ink);white-space:nowrap}
+
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border:1px solid var(--border);border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:18px}
+.badge span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+h1{font-size:clamp(1.6rem,4.5vw,2.3rem);font-weight:800;line-height:1.1;letter-spacing:-.04em;margin-bottom:10px}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--muted);font-size:.88rem;line-height:1.65;margin-bottom:28px}
+
+.price-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.price-label{font-size:.72rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.price-val{font-size:2.2rem;font-weight:800;letter-spacing:-.04em}
+.price-val small{font-size:.9rem;color:var(--muted);font-weight:400}
+.price-note{font-size:.75rem;color:var(--muted);margin-top:3px}
+
+.features{list-style:none;display:flex;flex-direction:column;gap:9px}
+.features li{display:flex;align-items:flex-start;gap:9px;font-size:.85rem;color:var(--muted);line-height:1.4}
+.features li svg{flex-shrink:0;margin-top:2px;color:var(--accent)}
+
+/* ---- Right column (form card) ---- */
+.form-col{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
+
+/* Steps */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.step{flex:1;text-align:center}
+.step-num{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted);margin:0 auto 4px;transition:all .3s}
+.step-num.active{border-color:var(--accent);color:var(--accent);background:rgba(224,92,43,.1)}
+.step-num.done{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,.1)}
+.step-label{font-size:.68rem;color:var(--muted)}
+.step-line{flex:0 0 20px;height:1px;background:var(--border)}
+
+/* Loading */
+#loading-state{text-align:center;padding:32px 0}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-state p{font-size:.85rem;color:var(--muted)}
+
+/* Auth state */
+#auth-state{display:none;text-align:center;padding:8px 0}
+#auth-state h2{font-size:1.05rem;font-weight:700;margin-bottom:10px}
+#auth-state p{color:var(--muted);font-size:.85rem;margin-bottom:20px;line-height:1.55}
+
+/* Form state */
+#form-state{display:none}
+#form-state h2{font-size:1rem;font-weight:700;margin-bottom:18px}
+
+/* User info */
+.user-card{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:18px}
+.user-avatar{width:38px;height:38px;border-radius:50%;background:rgba(224,92,43,.2);border:1px solid rgba(224,92,43,.4);display:grid;place-items:center;font-size:1rem;font-weight:800;color:var(--accent);flex-shrink:0}
+.user-name{font-size:.9rem;font-weight:700;line-height:1.2}
+.user-email-txt{font-size:.78rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;word-break:break-all}
+
+label{display:block;font-size:.75rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--ink);font-size:.92rem;padding:11px 14px;outline:none;transition:border-color .2s;margin-bottom:14px;font-family:'Syne',sans-serif}
+input:focus{border-color:var(--accent)}
+input::placeholder{color:#3a3a4a}
+
+.btn{width:100%;padding:13px;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;border:none;border-radius:8px;cursor:pointer;transition:opacity .15s;letter-spacing:-.01em}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-outline{width:100%;padding:12px;background:transparent;color:var(--ink);font-family:'Syne',sans-serif;font-size:.9rem;font-weight:600;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s;margin-top:10px}
+.btn-outline:hover{border-color:var(--accent)}
+
+.auth-alt{font-size:.8rem;color:var(--muted);margin-top:14px}
+.auth-alt button{background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Syne',sans-serif;font-size:.8rem;text-decoration:underline;padding:0}
+
+/* Resumo antes de pagar */
+.checkout-summary{background:rgba(224,92,43,.06);border:1px solid rgba(224,92,43,.2);border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cs-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:3px}
+.cs-price{font-size:1.5rem;font-weight:800;letter-spacing:-.04em}
+.cs-price small{font-size:.85rem;color:var(--muted);font-weight:400}
+.cs-right{font-size:.7rem;color:var(--muted);text-align:right;line-height:1.6}
+
+/* Valor no QR */
+.qr-value-row{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.qr-vl{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:#22c55e}
+.qr-vp{font-size:1.3rem;font-weight:800;letter-spacing:-.03em}
+
+.error-msg{color:#ef4444;font-size:.8rem;margin-bottom:12px;display:none;line-height:1.4}
+
+/* QR state */
+#qr-state{display:none;text-align:center}
+#qr-state h2{font-size:.95rem;font-weight:700;margin-bottom:16px}
+.qr-img{width:190px;height:190px;border-radius:8px;margin:0 auto 14px;display:block;border:4px solid #fff}
+.pix-code{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);word-break:break-all;text-align:left;margin-bottom:10px;cursor:pointer;transition:border-color .2s;line-height:1.4}
+.pix-code:hover{border-color:var(--accent)}
+.copy-hint{font-size:.72rem;color:var(--muted);margin-bottom:16px}
+.status-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+.status-dot.paid{background:#22c55e;animation:none}
+
+/* Success state */
+#success-state{display:none;text-align:center;padding:12px 0}
+.success-icon{width:52px;height:52px;border-radius:50%;background:rgba(34,197,94,.12);display:grid;place-items:center;margin:0 auto 14px}
+#success-state h3{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+#success-state p{color:var(--muted);font-size:.84rem;margin-bottom:3px}
+.countdown{font-size:.78rem;font-family:'JetBrains Mono',monospace;color:var(--accent);margin-top:12px}
+</style>
+</head>
+<body>
+
+<!-- Fundo do app simulado -->
+<div class="app-bg" aria-hidden="true">
+  <div class="app-bg-sidebar">
+    <div class="app-bg-sidebar-logo"></div>
+    <div class="app-bg-sidebar-nav">
+      <div class="app-bg-sidebar-item"></div>
+      <div class="app-bg-sidebar-item"></div>
+      <div class="app-bg-sidebar-item"></div>
+      <div class="app-bg-sidebar-item"></div>
+      <div class="app-bg-sidebar-item"></div>
+    </div>
+  </div>
+  <div class="app-bg-topbar"></div>
+  <div class="app-bg-cards">
+    <div class="app-bg-card"></div>
+    <div class="app-bg-card"></div>
+    <div class="app-bg-card"></div>
+    <div class="app-bg-card"></div>
+    <div class="app-bg-card"></div>
+    <div class="app-bg-card"></div>
+  </div>
+  <div class="app-bg-rows">
+    <div class="app-bg-row"></div>
+    <div class="app-bg-row"></div>
+    <div class="app-bg-row"></div>
+    <div class="app-bg-row"></div>
+  </div>
+  <div class="app-bg-scrim"></div>
+</div>
+
+<a class="back-link" href="/">← Já tenho acesso</a>
+
+<div class="page">
+  <div class="wrap">
+
+    <!-- Coluna esquerda: detalhes do plano -->
+    <div class="plan-col">
+      <div class="logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="8" fill="#ff4d1a"/><path d="M20.5 12C18.5 9.5 11.5 10 11.5 13.5C11.5 16.5 20.5 15.5 20.5 19C20.5 22.5 13.5 23 11.5 20.5" stroke="#121417" stroke-width="2.8" stroke-linecap="round"/></svg>
+        <span>SiteSales</span>
+      </div>
+
+      <div class="badge"><span></span>Prospecção inteligente</div>
+      <h1>Encontre o cliente certo.<br/><em>Venda o que ele precisa.</em></h1>
+      <p class="sub">Busque pequenos e grandes negócios, identifique oportunidades reais e chegue com a abordagem certa — antes da concorrência.</p>
+
+      <div class="price-box">
+        <div class="price-label">Acesso mensal · cancele quando quiser</div>
+        <div class="price-val">R$&nbsp;59<small>,90/mês</small></div>
+        <div class="price-note">Sem taxa de adesão · Sem contrato mínimo</div>
+      </div>
+
+      <ul class="features">
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>Busca inteligente de leads com filtros avançados</li>
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>Diagnóstico automático do site do lead</li>
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>Abordagem personalizada gerada na hora</li>
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>Funil Kanban para gerenciar oportunidades</li>
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>Construtor de site com identidade real do cliente</li>
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>Link de prévia para mostrar ao cliente antes de fechar</li>
+        <li><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.78 1.72a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 011.06-1.06l2.97 2.97 6.97-6.97a.75.75 0 011.06 0z"/></svg>200 buscas por mês · prévias ilimitadas</li>
+      </ul>
+    </div>
+
+    <!-- Coluna direita: checkout -->
+    <div class="form-col">
+
+      <!-- Black Friday countdown -->
+      <div class="bf-banner">
+        <div class="bf-left">
+          <div class="bf-label">Black Friday — Oferta especial</div>
+          <div class="bf-note">Renovada a cada 24 horas</div>
+        </div>
+        <div class="bf-timer" id="bf-timer">--:--:--</div>
+      </div>
+
+      <!-- Steps: Conta → Plano → Acesso -->
+      <div class="steps">
+        <div class="step">
+          <div class="step-num" id="step1">1</div>
+          <div class="step-label">Conta</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num" id="step2">2</div>
+          <div class="step-label">Plano</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num" id="step3">3</div>
+          <div class="step-label">Acesso</div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading-state">
+        <div class="spinner"></div>
+        <p>Verificando sua conta…</p>
+      </div>
+
+      <!-- Não autenticado -->
+      <div id="auth-state">
+        <h2>Criar conta para assinar</h2>
+        <p>Crie sua conta grátis e conclua o pagamento.<br/>Leva menos de 1 minuto.</p>
+        <button class="btn" id="btn-signup" type="button">Criar conta e continuar →</button>
+        <p class="auth-alt" style="margin-top:16px">Seus dados ficam seguros. Pago via PIX após o cadastro.</p>
+        <p class="auth-alt" style="margin-top:8px">Já tem conta? <button id="btn-signin" type="button" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Syne',sans-serif;font-size:.8rem;text-decoration:underline;padding:0">Entre para assinar.</button></p>
+      </div>
+
+      <!-- Formulário (autenticado) -->
+      <div id="form-state">
+        <h2>Plano</h2>
+
+        <label for="inp-name">Nome completo</label>
+        <input id="inp-name" type="text" placeholder="Seu nome" autocomplete="name"/>
+
+        <label for="inp-email">E-mail</label>
+        <input id="inp-email" type="email" placeholder="seu@email.com" readonly style="opacity:.6;cursor:default"/>
+
+        <label for="inp-phone">Celular (opcional)</label>
+        <input id="inp-phone" type="tel" placeholder="(11) 99999-9999" autocomplete="tel"/>
+
+        <div class="checkout-summary">
+          <div>
+            <div class="cs-label">Total a pagar</div>
+            <div class="cs-price">R$&nbsp;59<small>,90/mês</small></div>
+          </div>
+          <div class="cs-right">Acesso completo<br/>Cancele quando quiser</div>
+        </div>
+
+        <div class="error-msg" id="err"></div>
+
+        <button class="btn" id="btn-pay" type="button">Gerar QR Code PIX →</button>
+        <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:8px">🔒 Pagamento seguro via PIX · Ativação automática</p>
+      </div>
+
+      <!-- QR Code -->
+      <div id="qr-state">
+        <div class="qr-value-row">
+          <div class="qr-vl">Pagar agora</div>
+          <div class="qr-vp">R$&nbsp;59,90</div>
+        </div>
+        <h2>Escaneie o QR Code PIX</h2>
+        <img class="qr-img" id="qr-img" src="" alt="QR Code PIX"/>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px">Abra o app do seu banco e escaneie<br/>ou copie o código abaixo:</p>
+        <div class="pix-code" id="pix-code" title="Clique para copiar"></div>
+        <button class="btn btn-outline" id="btn-copy-pix" type="button" style="margin-bottom:16px;font-size:.82rem;padding:10px">📋 Copiar código PIX</button>
+        <div class="copy-hint" id="copy-hint" style="margin-bottom:16px"></div>
+        <div class="status-row">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-txt">Aguardando confirmação do banco…</span>
+        </div>
+        <button class="btn-outline" id="btn-back" type="button" style="margin-top:14px">← Voltar</button>
+      </div>
+
+      <!-- Sucesso -->
+      <div id="success-state">
+        <div class="success-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h3>Pagamento confirmado!</h3>
+        <p>Sua conta está sendo ativada.</p>
+        <p>Você será redirecionado para o app.</p>
+        <div class="countdown" id="countdown">Redirecionando em 5s…</div>
+      </div>
+
+    </div><!-- /form-col -->
+  </div><!-- /wrap -->
+</div><!-- /page -->
+
+<script
+  data-clerk-publishable-key="pk_live_Y2xlcmsuc2l0ZXNhbGVzLmNvbS5iciQ"
+  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5.21.0/dist/clerk.browser.js"
+  crossorigin="anonymous"></script>
+<script src="/planos.js"></script>
+</body>
+</html>

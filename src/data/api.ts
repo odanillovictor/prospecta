@@ -11,6 +11,7 @@ export interface MeResponse {
   usage: { searches: number; previews: number; month: string };
   dailySearches: number;
   remaining: { searches: number; previews: number };
+  ip_mismatch?: boolean;
 }
 
 const getToken = async (): Promise<string | null> => {

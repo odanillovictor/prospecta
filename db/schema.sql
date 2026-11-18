@@ -3,10 +3,11 @@
 -- Aplicar em produção: npx wrangler d1 execute prospecta-db --file=db/schema.sql
 
 CREATE TABLE IF NOT EXISTS users (
-  clerk_id   TEXT PRIMARY KEY,
-  email      TEXT NOT NULL,
-  active     INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  clerk_id      TEXT PRIMARY KEY,
+  email         TEXT NOT NULL,
+  active        INTEGER NOT NULL DEFAULT 0,
+  registered_ip TEXT,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS usage (

@@ -48,7 +48,7 @@ export function UpdateBar() {
   if (!fresh) return null;
   return (
     <div className="update-bar" role="status">
-      <span>Nova versão do Prospecta disponível.</span>
+      <span>Nova versão do SiteSales disponível.</span>
       <button className="btn btn-sm btn-accent" onClick={update} disabled={busy}>{busy ? 'Atualizando…' : 'Atualizar'}</button>
     </div>
   );

@@ -28,6 +28,6 @@ describe('contador mensal do Google', () => {
 
 describe('quota constants', () => {
   it('monthly searches limit is 200', () => expect(MONTHLY_SEARCHES).toBe(200));
-  it('monthly previews limit is 50', () => expect(MONTHLY_PREVIEWS).toBe(50));
+  it('monthly previews limit is 999999', () => expect(MONTHLY_PREVIEWS).toBe(999_999));
   it('daily warn threshold is 20', () => expect(DAILY_SEARCH_WARN).toBe(20));
 });

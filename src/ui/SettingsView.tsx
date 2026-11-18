@@ -94,7 +94,7 @@ export function SettingsView() {
           <span className="small muted">{leads.length} lead(s) salvos neste navegador ({leads.filter((l) => l.isDemo).length} de demonstração). Faça backup antes de trocar de computador ou limpar o navegador.</span>
           <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={async (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (!f) return; const r = store.importAll(await f.text()); toast(r.message, !r.ok); }} />
           <div className="row">
-            <button className="btn" onClick={() => downloadFile(`prospecta-backup-${new Date().toISOString().slice(0, 10)}.json`, store.exportAll())}><Icon name="download" /> Exportar backup</button>
+            <button className="btn" onClick={() => downloadFile(`sitesales-backup-${new Date().toISOString().slice(0, 10)}.json`, store.exportAll())}><Icon name="download" /> Exportar backup</button>
             <button className="btn" onClick={() => fileRef.current?.click()}><Icon name="upload" /> Importar backup</button>
             <button className="btn btn-ghost" style={{ color: 'var(--bad)' }} onClick={() => setConfirmClear(true)}><Icon name="trash" /> Apagar todos os leads</button>
           </div>

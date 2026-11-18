@@ -1,6 +1,6 @@
 // Service worker conservador: nunca intercepta /api, navegação é network-first (atualizações chegam
 // na hora quando há internet) e só arquivos com hash em /assets são servidos do cache.
-const VERSION = 'prospecta-v2';
+const VERSION = 'sitesales-v2';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon.svg'];
 
 self.addEventListener('install', (event) => {

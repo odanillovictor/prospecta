@@ -21,6 +21,8 @@ export interface Env {
   CLERK_SECRET_KEY?: string;
   /** Chave pública do Clerk (pode ficar em vars). */
   CLERK_PUBLISHABLE_KEY?: string;
+  /** App ID da OpenPix (Woovi) para geração de cobranças PIX (nunca em vars). */
+  MERCADOPAGO_ACCESS_TOKEN?: string;
 }
 
 export function json(data: unknown, status = 200, extra: Record<string, string> = {}): Response {

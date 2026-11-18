@@ -65,8 +65,7 @@ h3 { font-size: 16px; }
   display: flex; flex-direction: column; padding: 22px 14px; gap: 22px;
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; }
-.brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; }
-.brand-mark::after { content: ''; width: 10px; height: 10px; border-radius: 50%; border: 3px solid var(--ink); }
+.brand-mark { width: 30px; height: 30px; border-radius: 8px; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff4d1a%22/%3E%3Cpath d=%22M20.5 12C18.5 9.5 11.5 10 11.5 13.5C11.5 16.5 20.5 15.5 20.5 19C20.5 22.5 13.5 23 11.5 20.5%22 fill=%22none%22 stroke=%22%23121417%22 stroke-width=%222.8%22 stroke-linecap=%22round%22/%3E%3C/svg%3E") center/contain no-repeat; }
 .brand-name { font-family: var(--font-display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; }
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav button {

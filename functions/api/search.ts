@@ -53,7 +53,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
             };
           }
           const { value, hit } = await cached(`gp|${keyBase}`, TTL, async () => {
-            const r = await searchGooglePlaces(niche, location, limit, {
+            const r = await searchGooglePlaces(niche, location, Math.min(limit, 10), {
               apiKey: env.GOOGLE_PLACES_API_KEY!,
               fetchFn: (input, init) => fetchWithTimeout(String(input), init as RequestInit, 15_000),
             });
@@ -75,10 +75,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (anyMiss) await incrementQuota(env.DB!, clerkId, 'search');
 
   const cachedAt = settled.find((s) => s.cachedAt != null)?.cachedAt;
-  const body: SearchResponse & { cachedAt?: number; warning?: string } = {
+  const body: SearchResponse & { cachedAt?: number; warning?: string; searchesRemaining?: number; searchesTotal?: number } = {
     results: settled.flatMap((s) => s.results),
     providers: settled.map((s) => s.outcome),
     query: { niche, location },
+    searchesRemaining: quota.remaining,
+    searchesTotal: MONTHLY_SEARCHES,
     ...(cachedAt != null ? { cachedAt } : {}),
     ...(dailyWarning ? { warning: dailyWarning } : {}),
   };

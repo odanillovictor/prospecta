@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="pt-BR" class="preload">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiteSales — Encontre seus próximos clientes</title>
+  <meta name="description" content="SiteSales mapeia empresas da sua cidade, diagnostica seus sites e gera estratégias de abordagem prontas para fechar — tudo em segundos." />
+
+  <!-- Detecção de modo cinema ANTES do CSS -->
+  <script>
+    (function(){
+      var d=document.documentElement;
+      if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+      var mq=matchMedia('(min-width:900px) and (min-height:560px)');
+      d.classList.add(mq.matches?'cinema':'cinema-m');
+      mq.addEventListener('change',function(){setTimeout(function(){location.reload()},200)});
+    })();
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================
+       TOKENS
+    ===================================================== */
+    :root {
+      --ink:      #f0f0f5;
+      --muted:    #9898ae;
+      --dim:      #58586a;
+      --accent:   #e05c2b;
+      --accent-d: rgba(224,92,43,.14);
+      --bg:       #09090f;
+      --s1:       #111118;
+      --s2:       #17171f;
+      --border:   #22222e;
+
+      --sp1:8px; --sp2:16px; --sp3:24px; --sp5:40px; --sp8:64px;
+      --sec: clamp(72px,10svh,120px);
+      --hg:40px; --cg:24px;
+      --r:12px; --rsm:8px;
+      --menu-h:68px;
+      --mg: clamp(20px,5vw,80px);
+    }
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:auto}
+    body{
+      font-family:'Inter',system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+    }
+    img{display:block;max-width:100%}
+    a{color:inherit;text-decoration:none}
+
+    /* =====================================================
+       TIPOGRAFIA
+    ===================================================== */
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:'JetBrains Mono',monospace;font-size:11px;
+      letter-spacing:.12em;text-transform:uppercase;color:var(--accent);
+      margin-bottom:var(--sp2);
+    }
+    .eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--accent)}
+
+    h2{
+      font-family:'Syne',sans-serif;font-weight:800;
+      letter-spacing:-.035em;line-height:1.05;
+      font-size:clamp(2rem,1rem+3vw,3.6rem);
+    }
+
+    em.serif{
+      font-family:'DM Serif Display',serif;
+      font-style:italic;color:var(--accent);
+      font-weight:400;letter-spacing:-.01em;
+    }
+
+    p{color:var(--muted);line-height:1.65}
+
+    /* =====================================================
+       LAYOUT
+    ===================================================== */
+    .wrap{width:100%;max-width:1200px;margin-inline:auto;padding-inline:var(--mg)}
+    .stack{display:flex;flex-direction:column;gap:var(--cg)}
+
+    /* =====================================================
+       NAV
+    ===================================================== */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      height:var(--menu-h);display:flex;align-items:center;
+      justify-content:space-between;padding-inline:var(--mg);
+      border-bottom:1px solid transparent;
+      transition:background .3s,border-color .3s;
+    }
+    .nav.scrolled{
+      background:rgba(9,9,15,.88);backdrop-filter:blur(20px);
+      border-bottom-color:var(--border);
+    }
+    .nav__logo{
+      font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+      letter-spacing:-.03em;display:flex;align-items:center;gap:8px;
+    }
+    .nav__logo-dot{
+      width:24px;height:24px;border-radius:6px;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23e05c2b'/%3E%3Cpath d='M20.5 12C18.5 9.5 11.5 10 11.5 13.5C11.5 16.5 20.5 15.5 20.5 19C20.5 22.5 13.5 23 11.5 20.5' fill='none' stroke='%2309090f' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+    }
+    .nav__logo span{color:var(--accent)}
+    .nav__btn{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);
+      padding:10px 22px;font-size:14px;font-weight:700;letter-spacing:-.01em;
+      cursor:pointer;transition:opacity .2s,transform .15s;
+    }
+    .nav__btn:hover{opacity:.9;transform:translateY(-1px)}
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+    .hero{
+      position:relative;min-height:100svh;
+      display:flex;align-items:center;overflow:hidden;
+    }
+    #cityCanvas{position:absolute;inset:0;width:100%;height:100%}
+    .hero__vignette{
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse 80% 70% at 70% 50%,transparent 30%,rgba(9,9,15,.7) 100%);
+      pointer-events:none;
+    }
+    .hero__content{
+      position:relative;z-index:2;width:100%;
+      padding-top:var(--menu-h);
+    }
+    .hero__inner{max-width:680px}
+
+    .hero__pill{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--accent-d);border:1px solid rgba(224,92,43,.28);
+      border-radius:100px;padding:6px 14px;
+      font-family:'JetBrains Mono',monospace;font-size:11px;
+      letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+      margin-bottom:var(--sp3);
+    }
+    .hero__pill-dot{
+      width:6px;height:6px;border-radius:50%;background:var(--accent);
+      animation:blink 1.6s ease-in-out infinite;
+    }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+    .hero__h1{
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(2.8rem,2rem+4vw,5.8rem);
+      letter-spacing:-.045em;line-height:.96;
+      margin-bottom:var(--sp3);
+    }
+    .hero__sub{
+      font-size:clamp(1rem,.9rem+.5vw,1.2rem);color:var(--muted);
+      max-width:500px;line-height:1.65;margin-bottom:var(--sp5);
+    }
+    .hero__actions{display:flex;align-items:center;gap:var(--sp2);flex-wrap:wrap}
+
+    .btn-p{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);
+      padding:14px 30px;font-size:15px;font-weight:700;letter-spacing:-.015em;
+      cursor:pointer;transition:opacity .2s,transform .15s,box-shadow .2s;
+      box-shadow:0 0 0 rgba(224,92,43,0);
+    }
+    .btn-p:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 28px rgba(224,92,43,.35)}
+
+    .btn-g{
+      display:inline-flex;align-items:center;gap:8px;
+      background:transparent;color:var(--muted);
+      border:1px solid var(--border);border-radius:var(--rsm);
+      padding:14px 24px;font-size:15px;font-weight:600;cursor:pointer;
+      transition:color .2s,border-color .2s;
+    }
+    .btn-g:hover{color:var(--ink);border-color:rgba(240,240,245,.25)}
+
+    .hero__scroll{
+      position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      font-family:'JetBrains Mono',monospace;font-size:10px;
+      letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+    }
+    .hero__scroll-line{
+      width:1px;height:40px;
+      background:linear-gradient(to bottom,var(--accent),transparent);
+      animation:sline 2.2s ease-in-out infinite;
+    }
+    @keyframes sline{
+      0%{transform:scaleY(0);transform-origin:top}
+      50%{transform:scaleY(1);transform-origin:top}
+      51%{transform:scaleY(1);transform-origin:bottom}
+      100%{transform:scaleY(0);transform-origin:bottom}
+    }
+
+    /* =====================================================
+       STATS
+    ===================================================== */
+    .stats{padding:var(--sec) 0;border-top:1px solid var(--border)}
+    .stats__grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+      gap:1px;background:var(--border);
+      border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+    }
+    .stat{background:var(--s1);padding:var(--sp5) var(--sp3);text-align:center}
+    .stat__n{
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.04em;
+      color:var(--ink);line-height:1;margin-bottom:8px;
+    }
+    .stat__n span{color:var(--accent)}
+    .stat__l{font-size:13px;color:var(--muted)}
+
+    /* =====================================================
+       HOW (R2: cena presa com etapas)
+    ===================================================== */
+    .how{position:relative}
+
+    /* Cinema: cena presa */
+    html.cinema .how__scene{height:460vh}
+    html.cinema .how__pin{
+      position:sticky;top:0;height:100svh;overflow:clip;
+      display:flex;align-items:center;
+    }
+    html.cinema .how__grid{
+      display:grid;grid-template-columns:5fr 7fr;
+      gap:clamp(40px,6vw,80px);align-items:start;
+      padding-top:clamp(88px,12svh,110px);
+      padding-bottom:clamp(60px,8svh,90px);
+      width:100%;height:100%;
+    }
+    html.cinema .how__left{padding-top:0}
+
+    /* Not cinema: empilhado */
+    html:not(.cinema) .how__scene{padding:var(--sec) 0}
+    html:not(.cinema) .how__pin{/* noop */}
+    html:not(.cinema) .how__grid{
+      max-width:1200px;margin-inline:auto;
+      padding-inline:var(--mg);
+      display:flex;flex-direction:column;gap:var(--sp5);
+    }
+    html:not(.cinema) .how__vis-wrap{display:none}
+
+    .how__h2{
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(1.6rem,1rem+2.5vw,2.8rem);
+      letter-spacing:-.04em;line-height:1.05;margin-bottom:var(--sp3);
+    }
+    .how__track{
+      width:2px;height:0;background:var(--accent);
+      margin:var(--sp2) 0 var(--sp2) 1px;
+      transition:height .6s cubic-bezier(.16,1,.3,1);
+    }
+
+    .how__steps{list-style:none}
+    .how__step{
+      padding:var(--sp2) 0;
+      border-top:1px solid var(--border);
+      transition:border-color .4s;
+    }
+    .how__step:last-child{border-bottom:1px solid var(--border)}
+    .how__step.is-on{border-top-color:var(--accent)}
+    .how__step-hd{display:flex;align-items:center;gap:var(--sp2)}
+    .how__n{
+      font-family:'JetBrains Mono',monospace;font-size:11px;
+      letter-spacing:.1em;color:var(--accent);min-width:24px;
+    }
+    .how__step h3{
+      font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;
+      letter-spacing:-.02em;color:var(--dim);transition:color .35s;
+    }
+    .how__step.is-on h3{color:var(--ink)}
+    .how__step.is-done h3{color:var(--muted)}
+
+    .how__more{
+      display:grid;grid-template-rows:0fr;
+      transition:grid-template-rows .5s cubic-bezier(.16,1,.3,1);
+    }
+    .how__more-in{min-height:0;overflow:hidden}
+    .how__step.is-on .how__more{grid-template-rows:1fr}
+
+    html:not(.cinema) .how__more{grid-template-rows:1fr}
+
+    .how__more p{
+      font-size:13px;color:var(--muted);
+      margin-top:10px;padding-left:36px;line-height:1.65;
+    }
+    .how__tag{
+      display:inline-block;margin-top:10px;margin-left:36px;
+      padding:4px 10px;
+      background:var(--accent-d);border:1px solid rgba(224,92,43,.2);
+      border-radius:4px;
+      font-family:'JetBrains Mono',monospace;font-size:10px;
+      letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+    }
+
+    /* Janela palco (R3) */
+    .hv{
+      background:var(--s1);border:1px solid var(--border);
+      border-radius:var(--r);overflow:hidden;
+    }
+    .hv-bar{
+      display:flex;align-items:center;gap:6px;
+      padding:10px 14px;border-bottom:1px solid var(--border);
+      background:var(--s2);
+    }
+    .hv-bar i{display:block;width:10px;height:10px;border-radius:50%}
+    .hv-bar i:nth-child(1){background:#ff5f57}
+    .hv-bar i:nth-child(2){background:#febc2e}
+    .hv-bar i:nth-child(3){background:#28c840}
+    .hv-bar span{
+      margin-left:8px;font-family:'JetBrains Mono',monospace;
+      font-size:11px;color:var(--muted);letter-spacing:.04em;
+    }
+    .hv-body{position:relative;aspect-ratio:16/10;overflow:hidden}
+
+    /* ---- Mock busca ---- */
+    .mock-search{padding:16px;display:flex;flex-direction:column;gap:10px;height:100%}
+    .mock-bar{
+      display:flex;align-items:center;gap:10px;
+      background:var(--s2);border:1px solid var(--border);
+      border-radius:var(--rsm);padding:9px 13px;
+    }
+    .mock-bar input{
+      background:none;border:none;outline:none;
+      color:var(--ink);font-size:13px;flex:1;pointer-events:none;
+    }
+    .mock-results{display:flex;flex-direction:column;gap:7px}
+    .mock-row{
+      display:flex;align-items:center;gap:11px;
+      background:var(--s2);border:1px solid var(--border);
+      border-radius:var(--rsm);padding:9px 13px;
+    }
+    .mock-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .mock-row-name{font-size:12px;color:var(--ink);font-weight:600}
+    .mock-row-sub{font-size:11px;color:var(--muted)}
+    .mock-score{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+
+    /* ---- Mock diagnóstico ---- */
+    .mock-diag{padding:14px;display:flex;flex-direction:column;gap:10px;height:100%}
+    .mock-diag-hd{padding-bottom:10px;border-bottom:1px solid var(--border)}
+    .mock-diag-title{font-size:13px;font-weight:600;color:var(--ink)}
+    .mock-diag-url{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .mock-diag-items{display:flex;flex-direction:column;gap:9px;flex:1}
+    .mock-diag-row{display:flex;align-items:center;gap:8px}
+    .mock-diag-lbl{font-size:11px;color:var(--muted);min-width:72px}
+    .mock-diag-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+    .mock-diag-fill{height:100%;border-radius:2px;background:var(--accent)}
+    .mock-diag-val{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent);min-width:24px;text-align:right}
+    .mock-diag-alert{
+      padding:8px 10px;
+      background:rgba(224,92,43,.08);border:1px solid rgba(224,92,43,.2);
+      border-radius:6px;font-size:11px;color:var(--accent);line-height:1.5;
+    }
+
+    /* ---- Mock abordagem ---- */
+    .mock-approach{padding:14px;display:flex;flex-direction:column;gap:10px;height:100%}
+    .mock-approach-lbl{
+      font-family:'JetBrains Mono',monospace;font-size:10px;
+      letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+    }
+    .mock-msg{
+      flex:1;background:var(--s2);border:1px solid var(--border);
+      border-radius:var(--rsm);padding:13px;
+      font-size:12px;color:var(--ink);line-height:1.7;
+    }
+    .mock-msg em{color:var(--accent);font-style:normal;font-weight:600}
+    .mock-approach-btns{display:flex;gap:8px}
+    .mock-btn-p{
+      flex:1;padding:8px;background:var(--accent);border:none;
+      border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;
+    }
+    .mock-btn-g{
+      padding:8px 12px;background:var(--s2);border:1px solid var(--border);
+      border-radius:6px;color:var(--muted);font-size:11px;cursor:pointer;
+    }
+
+    /* ---- Mock funil ---- */
+    .mock-funil{padding:12px;height:100%;display:flex;flex-direction:column;gap:8px}
+    .mock-funil-row{display:flex;gap:8px;flex:1;overflow:hidden}
+    .mock-col{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+    .mock-col-hd{
+      font-size:10px;font-family:'JetBrains Mono',monospace;
+      letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+      border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:2px;
+    }
+    .mock-card{
+      background:var(--s2);border:1px solid var(--border);
+      border-radius:6px;padding:8px 10px;
+    }
+    .mock-card-name{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:3px}
+    .mock-card-tag{font-size:10px;color:var(--accent)}
+    .mock-card.closed{border-color:rgba(40,200,64,.25)}
+    .mock-card.closed .mock-card-tag{color:#28c840}
+
+    /* vis per step (desktop cinema) */
+    html.cinema .how__vis-wrap{position:relative}
+    html.cinema .how__vis{
+      position:absolute;inset:0;
+      opacity:0;transition:opacity .5s;pointer-events:none;
+    }
+    html.cinema .how__vis.is-on{opacity:1;pointer-events:auto}
+    html.cinema .how__vis-stack{position:relative;height:calc(100svh - 200px)}
+
+    /* =====================================================
+       FEATURES
+    ===================================================== */
+    .features{padding:var(--sec) 0}
+    .features-hd{
+      text-align:center;max-width:600px;margin-inline:auto;
+      margin-bottom:var(--sp8);
+    }
+    .features-hd p{margin-top:14px;font-size:1rem}
+    .features-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:1px;background:var(--border);
+      border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+    }
+    .fcard{
+      background:var(--s1);padding:var(--sp5) var(--sp3);
+      position:relative;overflow:hidden;transition:background .2s;
+    }
+    .fcard:hover{background:var(--s2)}
+    .fcard::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),transparent);
+      opacity:0;transition:opacity .3s;
+    }
+    .fcard:hover::before{opacity:1}
+    .fcard-num{
+      font-family:'JetBrains Mono',monospace;font-size:10px;
+      letter-spacing:.1em;color:var(--accent);margin-bottom:var(--sp2);
+    }
+    .fcard h3{
+      font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;
+      letter-spacing:-.025em;margin-bottom:10px;color:var(--ink);
+    }
+    .fcard p{font-size:13px;color:var(--muted);line-height:1.65}
+
+    /* =====================================================
+       ABORDAGEM
+    ===================================================== */
+    .approach{
+      padding:var(--sec) 0;
+      background:var(--s1);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+    }
+    .approach-grid{
+      display:grid;grid-template-columns:1fr 1fr;
+      gap:clamp(40px,8vw,100px);align-items:start;
+    }
+    @media(max-width:768px){.approach-grid{grid-template-columns:1fr}}
+    .approach-steps{display:flex;flex-direction:column}
+    .astep{
+      display:flex;gap:var(--sp3);padding:var(--sp3) 0;
+      border-bottom:1px solid var(--border);
+    }
+    .astep:last-child{border-bottom:none}
+    .astep-n{
+      font-family:'JetBrains Mono',monospace;font-size:11px;
+      color:var(--accent);min-width:28px;padding-top:2px;flex-shrink:0;
+    }
+    .astep h4{
+      font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;
+      letter-spacing:-.02em;color:var(--ink);margin-bottom:6px;
+    }
+    .astep p{font-size:13px}
+
+    /* =====================================================
+       CTA FINAL
+    ===================================================== */
+    .cta-fin{
+      padding:var(--sec) 0;text-align:center;
+      position:relative;overflow:hidden;
+    }
+    .cta-fin::before{
+      content:'';position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      width:min(900px,120vw);height:min(900px,120vw);
+      background:radial-gradient(circle,rgba(224,92,43,.07) 0%,transparent 60%);
+      pointer-events:none;
+    }
+    .cta-fin h2{
+      font-size:clamp(2.2rem,1.5rem+4vw,5rem);
+      max-width:700px;margin-inline:auto;margin-bottom:var(--sp3);
+    }
+    .cta-fin p{
+      max-width:460px;margin-inline:auto;
+      margin-bottom:var(--sp5);font-size:1.05rem;
+    }
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+    footer{border-top:1px solid var(--border);padding:var(--sp5) 0}
+    .footer-inner{
+      display:flex;justify-content:space-between;
+      align-items:center;gap:var(--sp3);flex-wrap:wrap;
+    }
+    .footer-copy{font-size:13px;color:var(--dim)}
+
+    /* =====================================================
+       HUD CTA FLUTUANTE (R5)
+    ===================================================== */
+    .hud{
+      position:fixed;bottom:28px;right:var(--mg);z-index:90;
+      display:flex;align-items:center;gap:10px;
+      background:var(--accent);color:#fff;
+      padding:13px 24px;border-radius:100px;
+      font-size:14px;font-weight:700;letter-spacing:-.01em;
+      box-shadow:0 8px 32px rgba(224,92,43,.4);
+      transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .35s,box-shadow .2s;
+      transform:translateY(100px);opacity:0;
+    }
+    .hud.show{transform:translateY(0);opacity:1}
+    .hud:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(224,92,43,.5)}
+
+    /* =====================================================
+       MISC
+    ===================================================== */
+    .preload *{transition:none!important}
+
+    @media(max-width:899px){
+      html.cinema-m .how__scene{padding:var(--sec) 0}
+      html.cinema-m .how__pin{/* noop */}
+      html.cinema-m .how__grid{
+        max-width:1200px;margin-inline:auto;
+        padding-inline:var(--mg);
+        display:flex;flex-direction:column;gap:var(--sp5);
+      }
+      html.cinema-m .how__vis-wrap{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="/" class="nav__logo">
+    <div class="nav__logo-dot"></div>
+    Site<span>Sales</span>
+  </a>
+  <a href="/sign-in" class="nav__btn">Entrar</a>
+  <a href="/planos.html" class="nav__btn" style="background:var(--accent);color:#fff;border-color:var(--accent)">Assinar</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="cityCanvas"></canvas>
+  <div class="hero__vignette"></div>
+  <div class="hero__content wrap">
+    <div class="hero__inner">
+      <div class="hero__pill">
+        <div class="hero__pill-dot"></div>
+        Prospecção inteligente
+      </div>
+      <h1 class="hero__h1">
+        Encontre seus<br>
+        próximos clientes<br>
+        <em class="serif">antes da concorrência.</em>
+      </h1>
+      <p class="hero__sub">
+        SiteSales mapeia empresas da sua cidade, diagnostica seus sites
+        e gera estratégias de abordagem prontas para fechar — tudo em segundos.
+      </p>
+      <div class="hero__actions">
+        <a href="/planos.html" class="btn-p">Começar agora →</a>
+        <a href="#how" class="btn-g">Ver como funciona</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero__scroll">
+    <div class="hero__scroll-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap">
+    <div class="stats__grid">
+      <div class="stat">
+        <div class="stat__n">200<span>+</span></div>
+        <div class="stat__l">buscas por mês</div>
+      </div>
+      <div class="stat">
+        <div class="stat__n"><span>&lt;</span>5s</div>
+        <div class="stat__l">por análise de empresa</div>
+      </div>
+      <div class="stat">
+        <div class="stat__n">6<span>×</span></div>
+        <div class="stat__l">ferramentas em uma só</div>
+      </div>
+      <div class="stat">
+        <div class="stat__n">1<span>×</span></div>
+        <div class="stat__l">plano · tudo incluso</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA (R2 + R3) -->
+<section class="how" id="how">
+  <div class="how__scene" data-scene>
+    <div class="how__pin" id="howPin">
+      <div class="how__grid wrap" id="howGrid">
+
+        <!-- Coluna esquerda -->
+        <div class="how__left">
+          <div class="eyebrow">Como funciona</div>
+          <h2 class="how__h2">Da busca ao<br><em class="serif">fechamento.</em></h2>
+          <div class="how__track" id="howTrack"></div>
+
+          <ol class="how__steps" id="howSteps">
+            <li class="how__step is-on" data-s="0">
+              <div class="how__step-hd">
+                <span class="how__n">01</span>
+                <h3>Busque empresas na sua cidade</h3>
+              </div>
+              <div class="how__more"><div class="how__more-in">
+                <p>Filtre por segmento, cidade, bairro ou palavra-chave. Resultados reais com contato, endereço e site em segundos.</p>
+                <span class="how__tag">Resultados em segundos</span>
+              </div></div>
+            </li>
+            <li class="how__step" data-s="1">
+              <div class="how__step-hd">
+                <span class="how__n">02</span>
+                <h3>Diagnóstico inteligente do site</h3>
+              </div>
+              <div class="how__more"><div class="how__more-in">
+                <p>O AI analisa o site da empresa automaticamente: velocidade, mobile, SEO, design. Você sabe exatamente o que oferecer antes do primeiro contato.</p>
+                <span class="how__tag">Argumento de venda pronto</span>
+              </div></div>
+            </li>
+            <li class="how__step" data-s="2">
+              <div class="how__step-hd">
+                <span class="how__n">03</span>
+                <h3>Estratégia de abordagem gerada</h3>
+              </div>
+              <div class="how__more"><div class="how__more-in">
+                <p>Com base no diagnóstico, o AI cria uma mensagem personalizada para o primeiro contato. Tom certo, argumento certo, cliente específico.</p>
+                <span class="how__tag">Personalizado para cada lead</span>
+              </div></div>
+            </li>
+            <li class="how__step" data-s="3">
+              <div class="how__step-hd">
+                <span class="how__n">04</span>
+                <h3>Gerencie no funil de vendas</h3>
+              </div>
+              <div class="how__more"><div class="how__more-in">
+                <p>Mova leads pelo pipeline, publique link de prévia para validação do cliente e acompanhe cada oportunidade até o fechamento.</p>
+                <span class="how__tag">Nada cai no esquecimento</span>
+              </div></div>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Coluna direita: janela-palco (desktop) -->
+        <div class="how__vis-wrap" id="howVisWrap">
+          <div class="how__vis-stack" id="howVisStack">
+
+            <!-- Vis 0: busca -->
+            <div class="how__vis is-on" data-v="0">
+              <div class="hv">
+                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · busca</span></div>
+                <div class="hv-body">
+                  <div class="mock-search">
+                    <div class="mock-bar">
+                      <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="#9898ae" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="#9898ae" stroke-width="2" stroke-linecap="round"/></svg>
+                      <input type="text" value="padarias · Florianópolis, SC" readonly>
+                    </div>
+                    <div class="mock-results">
+                      <div class="mock-row">
+                        <div class="mock-dot" style="background:var(--accent)"></div>
+                        <div><div class="mock-row-name">Padaria Dom Pedro</div><div class="mock-row-sub">Trindade · site desatualizado</div></div>
+                        <span class="mock-score">★ 9.2</span>
+                      </div>
+                      <div class="mock-row">
+                        <div class="mock-dot" style="background:#febc2e"></div>
+                        <div><div class="mock-row-name">Pão de Ouro</div><div class="mock-row-sub">Centro · sem presença digital</div></div>
+                        <span class="mock-score">★ 8.7</span>
+                      </div>
+                      <div class="mock-row">
+                        <div class="mock-dot" style="background:#28c840"></div>
+                        <div><div class="mock-row-name">Forno Artesanal</div><div class="mock-row-sub">Itacorubi · mobile quebrado</div></div>
+                        <span class="mock-score">★ 7.9</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vis 1: diagnóstico -->
+            <div class="how__vis" data-v="1">
+              <div class="hv">
+                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · diagnóstico</span></div>
+                <div class="hv-body">
+                  <div class="mock-diag">
+                    <div class="mock-diag-hd">
+                      <div class="mock-diag-title">Padaria Dom Pedro</div>
+                      <div class="mock-diag-url">padaria-dompedro.com.br</div>
+                    </div>
+                    <div class="mock-diag-items">
+                      <div class="mock-diag-row">
+                        <span class="mock-diag-lbl">Performance</span>
+                        <div class="mock-diag-track"><div class="mock-diag-fill" style="width:28%"></div></div>
+                        <span class="mock-diag-val">28</span>
+                      </div>
+                      <div class="mock-diag-row">
+                        <span class="mock-diag-lbl">Mobile</span>
+                        <div class="mock-diag-track"><div class="mock-diag-fill" style="width:35%"></div></div>
+                        <span class="mock-diag-val">35</span>
+                      </div>
+                      <div class="mock-diag-row">
+                        <span class="mock-diag-lbl">SEO</span>
+                        <div class="mock-diag-track"><div class="mock-diag-fill" style="width:52%"></div></div>
+                        <span class="mock-diag-val">52</span>
+                      </div>
+                      <div class="mock-diag-row">
+                        <span class="mock-diag-lbl">Design</span>
+                        <div class="mock-diag-track"><div class="mock-diag-fill" style="width:20%"></div></div>
+                        <span class="mock-diag-val">20</span>
+                      </div>
+                    </div>
+                    <div class="mock-diag-alert">⚠ Site com problemas críticos — oportunidade alta de venda</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vis 2: abordagem -->
+            <div class="how__vis" data-v="2">
+              <div class="hv">
+                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · abordagem</span></div>
+                <div class="hv-body">
+                  <div class="mock-approach">
+                    <div class="mock-approach-lbl">Mensagem gerada pelo AI</div>
+                    <div class="mock-msg">
+                      Olá! Vi que a Padaria Dom Pedro tem um site bonito, mas identifiquei que ele está lento no celular e perde visitantes na busca do Google.<br><br>
+                      <em>Tenho uma solução que corrige isso em até 5 dias</em> — sem precisar mudar nada do design que vocês já gostam.<br><br>
+                      Posso mostrar uma prévia do novo site gratuitamente?
+                    </div>
+                    <div class="mock-approach-btns">
+                      <button class="mock-btn-p">Copiar mensagem</button>
+                      <button class="mock-btn-g">Adaptar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vis 3: funil -->
+            <div class="how__vis" data-v="3">
+              <div class="hv">
+                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · pipeline</span></div>
+                <div class="hv-body">
+                  <div class="mock-funil">
+                    <div class="mock-funil-row">
+                      <div class="mock-col">
+                        <div class="mock-col-hd">Contato</div>
+                        <div class="mock-card"><div class="mock-card-name">Padaria Dom Pedro</div><div class="mock-card-tag">Aguardando resposta</div></div>
+                        <div class="mock-card"><div class="mock-card-name">Forno Artesanal</div><div class="mock-card-tag">Link enviado</div></div>
+                      </div>
+                      <div class="mock-col">
+                        <div class="mock-col-hd">Proposta</div>
+                        <div class="mock-card"><div class="mock-card-name">Pão de Ouro</div><div class="mock-card-tag">Prévia aprovada ✓</div></div>
+                      </div>
+                      <div class="mock-col">
+                        <div class="mock-col-hd">Fechado</div>
+                        <div class="mock-card closed"><div class="mock-card-name">Café Central</div><div class="mock-card-tag">Contrato assinado</div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- fim vis-wrap -->
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="features-hd">
+      <div class="eyebrow" style="justify-content:center">Tudo que você precisa</div>
+      <h2>Uma ferramenta.<br>Resultado completo.</h2>
+      <p>Do primeiro contato ao link de validação — sem precisar de mais nenhum app.</p>
+    </div>
+    <div class="features-grid">
+      <div class="fcard">
+        <div class="fcard-num">01</div>
+        <h3>Busca com filtros avançados</h3>
+        <p>Encontre empresas por segmento, cidade, bairro ou palavra-chave. Resultados reais com contato, endereço e site.</p>
+      </div>
+      <div class="fcard">
+        <div class="fcard-num">02</div>
+        <h3>Diagnóstico inteligente</h3>
+        <p>Analise automaticamente o site de cada prospect — velocidade, mobile, SEO, design — e saiba exatamente o que oferecer.</p>
+      </div>
+      <div class="fcard">
+        <div class="fcard-num">03</div>
+        <h3>Estratégia de abordagem</h3>
+        <p>Mensagens personalizadas geradas pelo AI com base no diagnóstico de cada empresa. Tom certo, argumento certo.</p>
+      </div>
+      <div class="fcard">
+        <div class="fcard-num">04</div>
+        <h3>Funil e pipeline de vendas</h3>
+        <p>Organize seus leads em colunas personalizáveis estilo Trello. Nenhuma oportunidade esquecida, nenhum follow-up perdido.</p>
+      </div>
+      <div class="fcard">
+        <div class="fcard-num">05</div>
+        <h3>Editor de sites moderno</h3>
+        <p>Crie e edite sites diretamente na plataforma. Funcional, rápido e profissional — sem precisar de ferramentas externas.</p>
+      </div>
+      <div class="fcard">
+        <div class="fcard-num">06</div>
+        <h3>Link de prévia para o cliente</h3>
+        <p>Publique uma prévia em segundos e envie o link para o cliente validar antes de finalizar. Profissional e ágil.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ESTRATÉGIA -->
+<section class="approach" id="strategy">
+  <div class="wrap">
+    <div class="approach-grid">
+      <div>
+        <div class="eyebrow">Estratégia</div>
+        <h2>A abordagem que<br><em class="serif">converte.</em></h2>
+        <p style="margin-top:20px;max-width:380px">
+          SiteSales não só encontra clientes — ele prepara você para fechar. Cada lead vem com um plano de ataque pronto.
+        </p>
+      </div>
+      <div class="approach-steps">
+        <div class="astep">
+          <span class="astep-n">01</span>
+          <div>
+            <h4>Identifique o problema</h4>
+            <p>O diagnóstico automático revela exatamente o que está errado no site do cliente. Você chega com dados, não suposições.</p>
+          </div>
+        </div>
+        <div class="astep">
+          <span class="astep-n">02</span>
+          <div>
+            <h4>Use o argumento certo</h4>
+            <p>A mensagem gerada pelo AI usa o diagnóstico para criar um primeiro contato personalizado e irrecusável para aquela empresa.</p>
+          </div>
+        </div>
+        <div class="astep">
+          <span class="astep-n">03</span>
+          <div>
+            <h4>Mostre antes de cobrar</h4>
+            <p>Publique a prévia do site e envie o link. O cliente vê o resultado antes de decidir. Taxa de conversão muito maior.</p>
+          </div>
+        </div>
+        <div class="astep">
+          <span class="astep-n">04</span>
+          <div>
+            <h4>Feche pelo funil</h4>
+            <p>Mova o lead pelo pipeline até o fechamento. Tudo registrado, nenhuma conversa perdida.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-fin" id="cta">
+  <div class="wrap">
+    <div class="eyebrow" style="justify-content:center;margin-bottom:var(--sp3)">Comece hoje</div>
+    <h2>Sua próxima venda<br>está <em class="serif">esperando.</em></h2>
+    <p>SiteSales — a ferramenta que transforma prospecção em um processo repetível, inteligente e lucrativo.</p>
+    <a href="/planos.html" class="btn-p" style="font-size:16px;padding:16px 38px">Criar minha conta →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="nav__logo">Site<span style="color:var(--accent)">Sales</span></div>
+      <div class="footer-copy">© 2026 SiteSales · Todos os direitos reservados</div>
+    </div>
+  </div>
+</footer>
+
+<!-- HUD CTA FLUTUANTE (R5) -->
+<a href="/planos.html" class="hud" id="hud">Começar agora →</a>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+
+<script>
+/* ===================================================
+   R1: BASE
+=================================================== */
+requestAnimationFrame(()=>document.documentElement.classList.remove('preload'));
+
+const CINEMA = document.documentElement.classList.contains('cinema');
+
+/* Lenis */
+const lenis = new Lenis({ lerp:.09, wheelMultiplier:.85, touchMultiplier:1.4 });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(t=>lenis.raf(t*1000));
+gsap.ticker.lagSmoothing(0);
+gsap.registerPlugin(ScrollTrigger);
+
+/* ===================================================
+   CANVAS CITY
+=================================================== */
+(function(){
+  const cv = document.getElementById('cityCanvas');
+  const cx = cv.getContext('2d');
+  let dots=[], W, H;
+
+  function resize(){
+    W = cv.width  = cv.offsetWidth;
+    H = cv.height = cv.offsetHeight;
+  }
+
+  function seed(){
+    dots=[];
+    const n = Math.floor(W*H/4200);
+    for(let i=0;i<n;i++){
+      const hot = Math.random()<.07;
+      dots.push({
+        x:Math.random()*W, y:Math.random()*H,
+        r: hot ? 1.6+Math.random()*1.8 : .5+Math.random()*1.1,
+        hot, phase:Math.random()*Math.PI*2,
+        spd:.3+Math.random()*.7,
+        dx:(Math.random()-.5)*.28, dy:(Math.random()-.5)*.28,
+      });
+    }
+  }
+
+  function draw(t){
+    cx.clearRect(0,0,W,H);
+    const time = t*.001;
+
+    /* grid sutil */
+    cx.strokeStyle='rgba(240,240,245,.018)'; cx.lineWidth=.5;
+    for(let x=0;x<W;x+=64){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke()}
+    for(let y=0;y<H;y+=64){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
+
+    for(const d of dots){
+      d.x+=d.dx; d.y+=d.dy;
+      if(d.x<0)d.x=W; if(d.x>W)d.x=0;
+      if(d.y<0)d.y=H; if(d.y>H)d.y=0;
+
+      const pulse = d.hot ? .5+.5*Math.sin(time*d.spd*2+d.phase) : 1;
+      const alpha = d.hot
+        ? .55+.45*pulse
+        : .1+.08*Math.sin(time*d.spd+d.phase);
+
+      cx.beginPath();
+      cx.arc(d.x,d.y, d.r*(d.hot?pulse*1.4:1), 0, Math.PI*2);
+      cx.fillStyle = d.hot
+        ? `rgba(224,92,43,${alpha})`
+        : `rgba(240,240,245,${alpha})`;
+      cx.fill();
+
+      if(d.hot && pulse>.75){
+        cx.beginPath();
+        cx.arc(d.x,d.y,d.r*5*pulse,0,Math.PI*2);
+        cx.fillStyle=`rgba(224,92,43,${.05*pulse})`;
+        cx.fill();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  let rstT;
+  window.addEventListener('resize',()=>{
+    clearTimeout(rstT);
+    rstT=setTimeout(()=>{resize();seed()},220);
+  });
+  resize(); seed(); draw(0);
+})();
+
+/* ===================================================
+   NAV scroll
+=================================================== */
+const nav = document.getElementById('nav');
+ScrollTrigger.create({
+  start:80,
+  onUpdate:st=>nav.classList.toggle('scrolled',st.progress>0),
+});
+
+/* ===================================================
+   HUD flutuante — muda texto por cena (R5)
+=================================================== */
+const hud = document.getElementById('hud');
+const HUD_TEXTS = {
+  default:'Começar agora →',
+  cta:'Criar minha conta →',
+};
+ScrollTrigger.create({
+  start:380,
+  onEnter:()=>hud.classList.add('show'),
+  onLeaveBack:()=>hud.classList.remove('show'),
+});
+ScrollTrigger.create({
+  trigger:'#cta',start:'top 60%',end:'bottom 60%',
+  onToggle:st=>{ hud.textContent = st.isActive ? HUD_TEXTS.cta : HUD_TEXTS.default; },
+});
+
+/* ===================================================
+   HERO — entrada em cascata
+=================================================== */
+if(CINEMA){
+  const ease='expo.out';
+  gsap.from('.hero__pill',   {y:20,opacity:0,duration:.8,ease,delay:.25});
+  gsap.from('.hero__h1',     {y:44,opacity:0,duration:1, ease,delay:.42});
+  gsap.from('.hero__sub',    {y:30,opacity:0,duration:.8,ease,delay:.6});
+  gsap.from('.hero__actions',{y:20,opacity:0,duration:.7,ease,delay:.76});
+}
+
+/* ===================================================
+   STATS
+=================================================== */
+gsap.from('.stat',{
+  y:30,opacity:0,stagger:.1,duration:.7,ease:'expo.out',
+  scrollTrigger:{trigger:'.stats',start:'top 80%'},
+});
+
+/* ===================================================
+   HOW — cena presa (R2)
+=================================================== */
+(function setupHow(){
+  const steps = [...document.querySelectorAll('[data-s]')];
+  const visEls = [...document.querySelectorAll('[data-v]')];
+  const scene  = document.querySelector('[data-scene]');
+  if(!scene) return;
+
+  function setStep(n){
+    steps.forEach((s,i)=>{
+      s.classList.toggle('is-on',  i===n);
+      s.classList.toggle('is-done',i<n);
+    });
+    visEls.forEach((v,i)=>{
+      v.classList.toggle('is-on',i===n);
+    });
+    /* track height */
+    const pct = n/(steps.length-1);
+    document.getElementById('howTrack').style.height=`${pct*100}%`;
+  }
+
+  if(CINEMA){
+    ScrollTrigger.create({
+      trigger:scene,start:'top top',end:'bottom bottom',scrub:false,
+      onUpdate:st=>{
+        const N=steps.length;
+        const idx=Math.min(N-1,Math.floor(st.progress*N*.999));
+        setStep(idx);
+      },
+    });
+  } else {
+    /* mobile: IntersectionObserver */
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add('is-on');
+      });
+    },{threshold:.35});
+    steps.forEach(s=>obs.observe(s));
+  }
+})();
+
+/* ===================================================
+   FEATURES
+=================================================== */
+gsap.from('.fcard',{
+  y:28,opacity:0,stagger:.07,duration:.6,ease:'expo.out',
+  scrollTrigger:{trigger:'.features-grid',start:'top 80%'},
+});
+
+/* ===================================================
+   APPROACH
+=================================================== */
+gsap.from('.astep',{
+  x:-18,opacity:0,stagger:.12,duration:.7,ease:'expo.out',
+  scrollTrigger:{trigger:'.approach',start:'top 70%'},
+});
+
+/* ===================================================
+   CTA FINAL
+=================================================== */
+if(CINEMA){
+  gsap.from('.cta-fin h2, .cta-fin p, .cta-fin .btn-p',{
+    y:36,opacity:0,stagger:.14,duration:.9,ease:'expo.out',
+    scrollTrigger:{trigger:'.cta-fin',start:'top 70%'},
+  });
+}
+</script>
+</body>
+</html>

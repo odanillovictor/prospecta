@@ -1,6 +1,7 @@
 import { RefreshButton, UpdateBar } from './UpdateBar';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useUser, RedirectToSignIn } from '@clerk/clerk-react';
+import { useUser, useClerk } from '@clerk/clerk-react';
+import { GateScreen } from './GateScreen';
 import { isClosed, type IntegrationStatus } from '../core/types';
 import { api, ApiError, type MeResponse } from '../data/api';
 import { useStoreError } from '../data/store';
@@ -28,8 +29,10 @@ const BASE_NAV: Array<{ view: View; label: string; short: string; icon: string }
   { view: 'prospectar', label: 'Prospectar', short: 'Buscar', icon: 'search' },
   { view: 'leads', label: 'Oportunidades', short: 'Leads', icon: 'list' },
   { view: 'funil', label: 'Funil', short: 'Funil', icon: 'funnel' },
-  { view: 'robo', label: 'Robô', short: 'Robô', icon: 'bot' },
   { view: 'ajustes', label: 'Ajustes', short: 'Ajustes', icon: 'cog' },
+];
+const ADMIN_EXTRA_NAV: Array<{ view: View; label: string; short: string; icon: string }> = [
+  { view: 'robo', label: 'Robô', short: 'Robô', icon: 'bot' },
 ];
 const ADMIN_NAV: Array<{ view: View; label: string; short: string; icon: string }> = [
   { view: 'admin', label: 'Admin', short: 'Admin', icon: 'cog' },
@@ -37,6 +40,7 @@ const ADMIN_NAV: Array<{ view: View; label: string; short: string; icon: string 
 
 export function App() {
   const { isLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
   const [route, go] = useRoute();
   const scored = useScoredLeads();
   const storeError = useStoreError();
@@ -47,7 +51,7 @@ export function App() {
   const [meLoaded, setMeLoaded] = useState(false);
 
   const isAdmin = user?.publicMetadata?.role === 'admin';
-  const NAV = isAdmin ? [...BASE_NAV, ...ADMIN_NAV] : BASE_NAV;
+  const NAV = isAdmin ? [...BASE_NAV, ...ADMIN_EXTRA_NAV, ...ADMIN_NAV] : BASE_NAV;
 
   useEffect(() => {
     if (!isSignedIn) return;
@@ -83,16 +87,52 @@ export function App() {
   }, []);
 
   if (!isLoaded || (isSignedIn && !meLoaded)) return <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}><span className="spinner" /></div>;
-  if (!isSignedIn) return <RedirectToSignIn />;
-  if (meData !== null && !meData.active) return (
+  if (!isSignedIn) return <GateScreen />;
+  if (meData !== null && meData.ip_mismatch) return (
     <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <div className="modal" style={{ width: 'min(420px, 100%)', textAlign: 'center' }}>
-        <div className="modal-head"><h2>Aguardando ativação</h2></div>
+        <div className="modal-head"><h2>Acesso de IP diferente</h2></div>
         <div className="modal-body">
-          <p>Sua conta foi criada! Aguarde a ativação pelo administrador para acessar a ferramenta.</p>
-          <a className="btn btn-primary" href="https://wa.me/55?text=Oi%2C+quero+ativar+minha+conta+no+Prospecta" target="_blank" rel="noopener noreferrer">
-            <Icon name="wa" /> Contato via WhatsApp
+          <p style={{ marginBottom: 16 }}>Detectamos um acesso de um IP diferente do cadastrado. Por segurança, sua sessão foi bloqueada.</p>
+          <p style={{ marginBottom: 24, color: 'var(--muted)', fontSize: 14 }}>Se você mudou de rede (Wi-Fi, dados móveis, VPN), entre em contato para liberar o acesso:</p>
+          <a
+            href="https://wa.me/5548988078599?text=Boa%20tarde%2C%20fui%20tentar%20entrar%2C%20mas%20meu%20IP%20aqui%20deu%20como%20diferente.%20Preciso%20de%20ajuda."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-accent"
+            style={{ display: 'inline-block', padding: '10px 24px' }}
+          >
+            Falar no WhatsApp
           </a>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Falha fechada: se não deu para confirmar o cadastro/assinatura, não libera o app.
+  if (meData === null) return (
+    <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div className="modal" style={{ width: 'min(420px, 100%)', textAlign: 'center' }}>
+        <div className="modal-head"><h2>Não foi possível verificar seu acesso</h2></div>
+        <div className="modal-body">
+          <p style={{ marginBottom: 20 }}>Tente de novo em instantes.</p>
+          <button className="btn btn-accent" style={{ marginRight: 8 }} onClick={() => location.reload()}>Tentar de novo</button>
+          <button className="btn" onClick={() => void signOut({ redirectUrl: '/' })}>Sair</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!meData.active) return (
+    <div className="shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div className="modal" style={{ width: 'min(420px, 100%)', textAlign: 'center' }}>
+        <div className="modal-head"><h2>Este e-mail não tem acesso</h2></div>
+        <div className="modal-body">
+          <p style={{ marginBottom: 8 }}>{meData.email ? `${meData.email} ainda não tem uma assinatura ativa.` : 'Sua conta ainda não tem uma assinatura ativa.'}</p>
+          <p style={{ marginBottom: 20, color: 'var(--muted)', fontSize: 14 }}>Assine para liberar a ferramenta. Se já pagou, a ativação é automática pelo mesmo e-mail do pagamento.</p>
+          <a href="/planos.html" className="btn btn-accent" style={{ display: 'inline-block', padding: '10px 24px', marginRight: 8 }}>Assinar</a>
+          <button className="btn" style={{ marginRight: 8 }} onClick={() => location.reload()}>Verificar acesso</button>
+          <button className="btn" onClick={() => void signOut({ redirectUrl: '/' })}>Sair</button>
         </div>
       </div>
     </div>
@@ -106,7 +146,7 @@ export function App() {
     <IntegrationsCtx.Provider value={{ status: integrations, error: intError, reload: () => setTick((t) => t + 1) }}>
       <div className="shell">
         <aside className="sidebar">
-          <div className="brand"><div className="brand-mark" /><span className="brand-name">Prospecta</span></div>
+          <div className="brand"><div className="brand-mark" /><span className="brand-name">SiteSales</span></div>
           <nav className="nav" aria-label="Principal">
             {NAV.map((n) => (
               <button key={n.view} aria-current={route.view === n.view ? 'page' : undefined} onClick={() => go({ view: n.view })}>
@@ -125,7 +165,7 @@ export function App() {
 
         <UpdateBar />
         <header className="topbar">
-          <div className="brand-mark" /><span className="brand-name">Prospecta</span>
+          <div className="brand-mark" /><span className="brand-name">SiteSales</span>
           <RefreshButton className="refresh-top" />
           <span className="chip chip-hot">{hot} quentes</span>
         </header>
@@ -133,7 +173,7 @@ export function App() {
         <main className="main">
           {storeError && <div style={{ marginBottom: 14 }}><Notice kind="error">{storeError}</Notice></div>}
           {route.view === 'dashboard' && <DashboardView meData={meData} />}
-          {route.view === 'prospectar' && <SearchView onOpenLead={(id) => go({ view: 'leads', leadId: id })} meData={meData} />}
+          {route.view === 'prospectar' && <SearchView onOpenLead={(id) => go({ view: 'prospectar', leadId: id })} meData={meData} />}
           {route.view === 'leads' && <LeadsView scored={scored} onOpen={(id) => go({ view: 'leads', leadId: id })} goSearch={() => go({ view: 'prospectar' })} />}
           {route.view === 'funil' && <FunnelView scored={scored} onOpen={(id) => go({ view: 'funil', leadId: id })} />}
           {route.view === 'robo' && <RobotView />}

@@ -1,7 +1,7 @@
 // Verificação e incremento de cotas de uso no D1 (mensais e diárias).
 
 export const MONTHLY_SEARCHES = 200;
-export const MONTHLY_PREVIEWS = 50;
+export const MONTHLY_PREVIEWS = 999_999;
 export const DAILY_SEARCH_WARN = 20;
 
 export interface QuotaResult {
@@ -22,6 +22,19 @@ export async function ensureUser(
     .prepare('SELECT active FROM users WHERE clerk_id = ?')
     .bind(clerkId)
     .first<{ active: number }>();
+
+  // Auto-ativar se o e-mail tem uma compra paga (checkout PIX)
+  if (!(row?.active)) {
+    const paid = await db
+      .prepare("SELECT id FROM purchases WHERE email = ? AND status = 'PAID' LIMIT 1")
+      .bind(email.toLowerCase())
+      .first();
+    if (paid) {
+      await db.prepare('UPDATE users SET active = 1 WHERE clerk_id = ?').bind(clerkId).run();
+      return { active: true };
+    }
+  }
+
   return { active: (row?.active ?? 0) === 1 };
 }
 
