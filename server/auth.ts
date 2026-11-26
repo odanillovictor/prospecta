@@ -90,9 +90,11 @@ export async function verifyClerkToken(request: Request, env: Env): Promise<Cler
       email = '';
     }
 
+    const OWNER_EMAILS = ['dangrafico.1@gmail.com'];
     const isAdmin =
       roleFromMeta((payload as any).publicMetadata) === 'admin' ||
-      roleFromMeta((payload as any).metadata) === 'admin';
+      roleFromMeta((payload as any).metadata) === 'admin' ||
+      OWNER_EMAILS.includes(email);
 
     return { clerkId: payload.sub, email, isAdmin };
   } catch {

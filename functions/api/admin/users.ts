@@ -22,7 +22,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const users = (rows.results ?? []).map((r) => ({
     clerkId: r.clerk_id,
     email: r.email,
-    active: r.active === 1,
+    active: r.active,
     createdAt: r.created_at,
     searches: r.searches,
     previews: r.previews,
