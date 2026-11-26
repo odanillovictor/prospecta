@@ -23,6 +23,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     active = true;
   }
 
+  // Salva método de login (enviado pelo cliente via header X-Login-Hint)
+  const loginHint = request.headers.get('x-login-hint');
+  if (loginHint === 'google' || loginHint === 'email') {
+    await db.prepare('UPDATE users SET login_method = ? WHERE clerk_id = ?').bind(loginHint, clerkId).run();
+  }
+
   // Verificação de IP (admin está isento)
   let ip_mismatch = false;
   if (!isAdmin) {
@@ -62,6 +68,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     clerkId,
     email,
     active,
+    isAdmin,
     ip_mismatch,
     usage: { searches, previews, month },
     dailySearches,

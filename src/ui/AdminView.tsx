@@ -6,8 +6,10 @@ interface UserRow {
   clerkId: string;
   email: string;
   active: number;
+  loginMethod: string;
   searches: number;
   previews: number;
+  spent: number;
   createdAt: string;
 }
 
@@ -68,9 +70,11 @@ export default function AdminView() {
         <thead>
           <tr>
             <th style={th}>E-mail</th>
+            <th style={th}>Login via</th>
             <th style={th}>Status</th>
             <th style={th}>Buscas/mês</th>
             <th style={th}>Prévias/mês</th>
+            <th style={th}>Gasto total</th>
             <th style={th}>Cadastro</th>
             <th style={th}></th>
           </tr>
@@ -79,6 +83,7 @@ export default function AdminView() {
           {users.map((u) => (
             <tr key={u.clerkId} style={{ borderBottom: '1px solid var(--border)' }}>
               <td style={td}>{u.email}</td>
+              <td style={td}>{u.loginMethod === 'google' ? 'Google' : 'E-mail'}</td>
               <td style={td}>
                 <span style={{ color: u.active === 1 ? 'var(--ok)' : 'var(--muted)' }}>
                   {u.active === 1 ? 'Ativo' : 'Inativo'}
@@ -86,6 +91,9 @@ export default function AdminView() {
               </td>
               <td style={{ ...td, textAlign: 'right' }}>{u.searches}</td>
               <td style={{ ...td, textAlign: 'right' }}>{u.previews}</td>
+              <td style={{ ...td, textAlign: 'right' }}>
+                {u.spent > 0 ? `R$ ${(u.spent / 100).toFixed(2).replace('.', ',')}` : '—'}
+              </td>
               <td style={td}>{fmtDate(u.createdAt)}</td>
               <td style={td}>
                 <button

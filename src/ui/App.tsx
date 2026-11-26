@@ -50,13 +50,14 @@ export function App() {
   const [meData, setMeData] = useState<MeResponse | null>(null);
   const [meLoaded, setMeLoaded] = useState(false);
 
-  const isAdmin = user?.publicMetadata?.role === 'admin';
+  const isAdmin = user?.publicMetadata?.role === 'admin' || meData?.isAdmin === true;
   const NAV = isAdmin ? [...BASE_NAV, ...ADMIN_EXTRA_NAV, ...ADMIN_NAV] : BASE_NAV;
 
   useEffect(() => {
     if (!isSignedIn) return;
     let alive = true;
-    api.me().then((m) => { if (alive) { setMeData(m); setMeLoaded(true); } }).catch(() => { if (alive) setMeLoaded(true); });
+    const isGoogle = user?.externalAccounts?.some((a: any) => (a.provider as string)?.includes('google')) ?? false;
+    api.me(isGoogle ? 'google' : 'email').then((m) => { if (alive) { setMeData(m); setMeLoaded(true); } }).catch(() => { if (alive) setMeLoaded(true); });
     return () => { alive = false; };
   }, [isSignedIn]);
 

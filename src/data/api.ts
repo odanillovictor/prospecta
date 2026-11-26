@@ -8,6 +8,7 @@ export interface MeResponse {
   clerkId: string;
   email: string;
   active: boolean;
+  isAdmin?: boolean;
   usage: { searches: number; previews: number; month: string };
   dailySearches: number;
   remaining: { searches: number; previews: number };
@@ -118,8 +119,9 @@ export const coletorApi = {
 
 export const api = {
   /** Dados do usuário logado: cota, uso e status de ativação. */
-  async me(): Promise<MeResponse> {
-    return (await call<MeResponse>('/api/me', { method: 'GET' }, 10_000)).data;
+  async me(loginHint?: 'google' | 'email'): Promise<MeResponse> {
+    const extra = loginHint ? { headers: { 'X-Login-Hint': loginHint } } : {};
+    return (await call<MeResponse>('/api/me', { method: 'GET', ...extra }, 10_000)).data;
   },
   /** Despublica a prévia online (o link para de funcionar). */
   async unpublishPreview(id: string): Promise<void> {
