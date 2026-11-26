@@ -113,6 +113,11 @@
       background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23e05c2b'/%3E%3Cpath d='M20.5 12C18.5 9.5 11.5 10 11.5 13.5C11.5 16.5 20.5 15.5 20.5 19C20.5 22.5 13.5 23 11.5 20.5' fill='none' stroke='%2309090f' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
     }
     .nav__logo span{color:var(--accent)}
+    .nav__link{
+      font-size:14px;color:var(--muted);font-weight:500;
+      transition:color .2s;padding:8px 12px;
+    }
+    .nav__link:hover{color:var(--ink)}
     .nav__btn{
       display:inline-flex;align-items:center;gap:8px;
       background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);
@@ -551,8 +556,8 @@
     <div class="nav__logo-dot"></div>
     Site<span>Sales</span>
   </a>
-  <a href="/sign-in" class="nav__btn">Entrar</a>
-  <a href="/planos.html" class="nav__btn" style="background:var(--accent);color:#fff;border-color:var(--accent)">Assinar</a>
+  <a href="/sign-in" class="nav__link">Entrar</a>
+  <a href="/planos.html" class="nav__btn">Assinar — R$59/mês</a>
 </nav>
 
 <!-- HERO -->
@@ -578,6 +583,9 @@
         <a href="/planos.html" class="btn-p">Começar agora →</a>
         <a href="#how" class="btn-g">Ver como funciona</a>
       </div>
+      <p style="margin-top:16px;font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;letter-spacing:.04em">
+        R$&nbsp;59/mês · sem contrato · cancele quando quiser
+      </p>
     </div>
   </div>
   <div class="hero__scroll">
@@ -673,7 +681,7 @@
             <!-- Vis 0: busca -->
             <div class="how__vis is-on" data-v="0">
               <div class="hv">
-                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · busca</span></div>
+                <div class="hv-bar"><i></i><i></i><i></i><span>SiteSales · busca</span></div>
                 <div class="hv-body">
                   <div class="mock-search">
                     <div class="mock-bar">
@@ -705,7 +713,7 @@
             <!-- Vis 1: diagnóstico -->
             <div class="how__vis" data-v="1">
               <div class="hv">
-                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · diagnóstico</span></div>
+                <div class="hv-bar"><i></i><i></i><i></i><span>SiteSales · diagnóstico</span></div>
                 <div class="hv-body">
                   <div class="mock-diag">
                     <div class="mock-diag-hd">
@@ -743,7 +751,7 @@
             <!-- Vis 2: abordagem -->
             <div class="how__vis" data-v="2">
               <div class="hv">
-                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · abordagem</span></div>
+                <div class="hv-bar"><i></i><i></i><i></i><span>SiteSales · abordagem</span></div>
                 <div class="hv-body">
                   <div class="mock-approach">
                     <div class="mock-approach-lbl">Mensagem gerada pelo AI</div>
@@ -764,7 +772,7 @@
             <!-- Vis 3: funil -->
             <div class="how__vis" data-v="3">
               <div class="hv">
-                <div class="hv-bar"><i></i><i></i><i></i><span>prospect-ai · pipeline</span></div>
+                <div class="hv-bar"><i></i><i></i><i></i><span>SiteSales · pipeline</span></div>
                 <div class="hv-body">
                   <div class="mock-funil">
                     <div class="mock-funil-row">
@@ -881,6 +889,42 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section style="padding:var(--sec) 0;border-top:1px solid var(--border)">
+  <div class="wrap" style="max-width:680px;margin-inline:auto;text-align:center">
+    <div class="eyebrow" style="justify-content:center">Preço</div>
+    <h2 style="font-size:clamp(2rem,.5rem+4vw,3.6rem);margin-bottom:var(--sp3)">Um plano.<br><em class="serif">Tudo incluso.</em></h2>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:var(--sp5) var(--sp5);margin-bottom:var(--sp3)">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3rem,6vw,5rem);letter-spacing:-.05em;color:var(--ink);line-height:1">
+        R$&nbsp;59<span style="font-size:1.2rem;color:var(--muted);font-weight:600">/mês</span>
+      </div>
+      <p style="margin-top:8px;font-size:14px;color:var(--muted)">Sem taxa de setup · sem contrato · cancele quando quiser</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:var(--sp3);text-align:left">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="color:var(--accent);font-size:16px">✓</span> 200 buscas/mês
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="color:var(--accent);font-size:16px">✓</span> Diagnóstico de sites com AI
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="color:var(--accent);font-size:16px">✓</span> Estratégia de abordagem gerada
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="color:var(--accent);font-size:16px">✓</span> Funil de vendas completo
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="color:var(--accent);font-size:16px">✓</span> Editor de sites moderno
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="color:var(--accent);font-size:16px">✓</span> Link de prévia para o cliente
+        </div>
+      </div>
+      <a href="/planos.html" class="btn-p" style="margin-top:var(--sp5);font-size:16px;padding:16px 38px;display:inline-flex">Assinar agora →</a>
+    </div>
+    <p style="font-size:12px;color:var(--dim)">Pagamento via PIX · ativação imediata</p>
   </div>
 </section>
 
