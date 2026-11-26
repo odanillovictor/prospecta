@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "dev:api": "wrangler pages dev dist --port 8788 --compatibility-date=2024-09-23",
-    "build": "vite build",
+    "build": "vite build && node scripts/post-build.cjs",
     "preview": "npm run build && wrangler pages dev dist --port 8788 --compatibility-date=2024-09-23",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p functions/tsconfig.json --noEmit",
     "test": "vitest run",
