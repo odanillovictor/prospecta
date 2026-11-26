@@ -27,24 +27,30 @@ function issuerFromPublishableKey(pk: string): string | null {
   }
 }
 
-// Busca a chave pública RSA do endpoint JWKS e devolve como PEM.
-async function fetchJwtKey(issuer: string): Promise<string | null> {
+// Busca todas as chaves públicas RSA do endpoint JWKS e devolve como PEMs.
+async function fetchJwtKeys(issuer: string): Promise<string[]> {
   try {
     const res = await fetch(`${issuer}/.well-known/jwks.json`);
-    if (!res.ok) return null;
+    if (!res.ok) return [];
     const { keys } = (await res.json()) as { keys: JsonWebKey[] };
-    if (!keys?.length) return null;
-    const cryptoKey = await crypto.subtle.importKey(
-      'jwk', keys[0],
-      { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-      true, ['verify'],
-    );
-    const spki = await crypto.subtle.exportKey('spki', cryptoKey);
-    const b64 = btoa(String.fromCharCode(...new Uint8Array(spki as ArrayBuffer)));
-    const lines = b64.match(/.{1,64}/g)!.join('\n');
-    return `-----BEGIN PUBLIC KEY-----\n${lines}\n-----END PUBLIC KEY-----`;
+    if (!keys?.length) return [];
+    const pems: string[] = [];
+    for (const key of keys) {
+      try {
+        const cryptoKey = await crypto.subtle.importKey(
+          'jwk', key,
+          { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+          true, ['verify'],
+        );
+        const spki = await crypto.subtle.exportKey('spki', cryptoKey);
+        const b64 = btoa(String.fromCharCode(...new Uint8Array(spki as ArrayBuffer)));
+        const lines = b64.match(/.{1,64}/g)!.join('\n');
+        pems.push(`-----BEGIN PUBLIC KEY-----\n${lines}\n-----END PUBLIC KEY-----`);
+      } catch { /* skip key inválida */ }
+    }
+    return pems;
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -66,15 +72,16 @@ export async function verifyClerkToken(request: Request, env: Env): Promise<Cler
       } catch { /* tenta JWKS abaixo */ }
     }
 
-    // Fallback: JWKS público derivado da publishable key (não precisa da secret key)
+    // Fallback: JWKS público — tenta todas as chaves disponíveis
     if (!payload && env.CLERK_PUBLISHABLE_KEY) {
       const issuer = issuerFromPublishableKey(env.CLERK_PUBLISHABLE_KEY);
       if (issuer) {
-        const jwtKey = await fetchJwtKey(issuer);
-        if (jwtKey) {
+        const jwtKeys = await fetchJwtKeys(issuer);
+        for (const jwtKey of jwtKeys) {
           try {
             payload = await verifyToken(token, { jwtKey, authorizedParties: allowedOrigins });
-          } catch { /* payload remains null */ }
+            if (payload?.sub) break;
+          } catch { /* tenta próxima */ }
         }
       }
     }
@@ -95,10 +102,12 @@ export async function verifyClerkToken(request: Request, env: Env): Promise<Cler
     }
 
     const OWNER_EMAILS = ['dangrafico.1@gmail.com'];
+    const OWNER_CLERK_IDS = ['user_3MHezFklTjdo1yzYBNjmsPnpW5l'];
     const isAdmin =
       roleFromMeta((payload as any).publicMetadata) === 'admin' ||
       roleFromMeta((payload as any).metadata) === 'admin' ||
-      OWNER_EMAILS.includes(email);
+      OWNER_EMAILS.includes(email) ||
+      OWNER_CLERK_IDS.includes(payload.sub);
 
     return { clerkId: payload.sub, email, isAdmin };
   } catch {

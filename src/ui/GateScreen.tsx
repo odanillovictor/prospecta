@@ -64,8 +64,8 @@ export function GateScreen() {
               <span style={{ fontWeight:800, fontSize:'1rem', letterSpacing:'-.03em', color:'#f0f0f5' }}>SiteSales</span>
             </div>
             {isIn
-              ? <SignIn routing="hash" signUpUrl="/sign-up" forceRedirectUrl="/" fallbackRedirectUrl="/" />
-              : <SignUp routing="hash" signInUrl="/sign-in" forceRedirectUrl="/" fallbackRedirectUrl="/" />}
+              ? <SignIn routing="hash" signUpUrl="/sign-up" forceRedirectUrl="/app" fallbackRedirectUrl="/app" />
+              : <SignUp routing="hash" signInUrl="/sign-in" forceRedirectUrl="/app" fallbackRedirectUrl="/app" />}
             <a href="/" style={{ color:'#58586a', fontSize:'.8rem', textDecoration:'none', marginTop:12 }}>← Voltar</a>
           </div>
         </div>
